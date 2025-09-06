@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'screens/home_screen.dart';
+import 'widgets/main_tab_scaffold.dart';
 import 'screens/booking/booking_form_screen.dart';
 
 void main() async {
@@ -33,7 +33,7 @@ final _router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) => const MainTabScaffold(),
     ),
     GoRoute(
       path: '/booking',

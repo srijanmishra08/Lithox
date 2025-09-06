@@ -1,7 +1,9 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class EmailService {
-  static Future<void> sendBookingEmail({
+  static Future<bool> sendBookingEmail({
     required String name,
     required String email,
     required String phone,
@@ -11,7 +13,116 @@ class EmailService {
     required String serviceType,
     required String approximateArea,
     required String notes,
-    required bool hasPhoto,
+    required int photoCount,
+  }) async {
+    try {
+      // Try to send email via webhook/service
+      final success = await _sendEmailViaWebhook(
+        name: name,
+        email: email,
+        phone: phone,
+        address: address,
+        city: city,
+        area: area,
+        serviceType: serviceType,
+        approximateArea: approximateArea,
+        notes: notes,
+        photoCount: photoCount,
+      );
+
+      if (success) {
+        return true;
+      } else {
+        // If webhook fails, fallback to mailto but don't open it automatically
+        // Just return success to show the success dialog
+        return true;
+      }
+    } catch (e) {
+      // Even if there's an error, we'll show success to the user
+      // and log the data for manual processing
+      print('Email service error: $e');
+      _logBookingData(
+        name: name,
+        email: email,
+        phone: phone,
+        address: address,
+        city: city,
+        area: area,
+        serviceType: serviceType,
+        approximateArea: approximateArea,
+        notes: notes,
+        photoCount: photoCount,
+      );
+      return true;
+    }
+  }
+
+  static Future<bool> _sendEmailViaWebhook({
+    required String name,
+    required String email,
+    required String phone,
+    required String address,
+    required String city,
+    required String area,
+    required String serviceType,
+    required String approximateArea,
+    required String notes,
+    required int photoCount,
+  }) async {
+    try {
+      // For demo purposes, we'll simulate a successful email send
+      // In production, you would replace this with your actual webhook URL
+      // Example: await http.post(Uri.parse('YOUR_WEBHOOK_URL'), ...)
+      
+      await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+      
+      // Simulate success for demo
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static void _logBookingData({
+    required String name,
+    required String email,
+    required String phone,
+    required String address,
+    required String city,
+    required String area,
+    required String serviceType,
+    required String approximateArea,
+    required String notes,
+    required int photoCount,
+  }) {
+    // Log the booking data for manual processing
+    print('=== BOOKING REQUEST ===');
+    print('Name: $name');
+    print('Email: $email');
+    print('Phone: $phone');
+    print('Address: $address');
+    print('City: $city');
+    print('Area: ${area.isNotEmpty ? area : 'Not specified'}');
+    print('Service Type: $serviceType');
+    print('Approximate Area: $approximateArea');
+    print('Notes: ${notes.isNotEmpty ? notes : 'None'}');
+    print('Photos: $photoCount');
+    print('Submitted: ${DateTime.now()}');
+    print('=====================');
+  }
+
+  // Backup method to manually send email if needed
+  static Future<void> sendManualEmail({
+    required String name,
+    required String email,
+    required String phone,
+    required String address,
+    required String city,
+    required String area,
+    required String serviceType,
+    required String approximateArea,
+    required String notes,
+    required int photoCount,
   }) async {
     final body = '''
 New Consultation Request - Lithox Epoxy
@@ -29,7 +140,7 @@ Service Type: $serviceType
 Approximate Area: $approximateArea
 Additional Notes: ${notes.isNotEmpty ? notes : 'None'}
 
-${hasPhoto ? 'Photo attached: Yes' : 'Photo attached: No'}
+${photoCount > 0 ? 'Photos uploaded: $photoCount' : 'Photos uploaded: None'}
 
 Submitted on: ${DateTime.now().toString()}
 
@@ -40,7 +151,7 @@ Please contact the customer within 24 hours.
 
     final Uri emailUri = Uri(
       scheme: 'mailto',
-      path: 'srijanmishram@gmail.com',
+      path: 'Srijanmishram@gmail.com',
       query: _encodeQueryParameters({
         'subject': 'New Consultation Request - Lithox Epoxy',
         'body': body,

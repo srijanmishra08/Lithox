@@ -1,6 +1,8 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../providers/tab_navigation_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -21,7 +23,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               
               // Hero Section
-              _buildHeroSection(context, theme),
+              _buildHeroSection(context, theme, ref),
               const SizedBox(height: 24),
               
               // About Lithox
@@ -36,8 +38,12 @@ class HomeScreen extends ConsumerWidget {
               _buildWhyChooseUs(theme),
               const SizedBox(height: 24),
               
+              // Contact Information
+              _buildContactSection(theme),
+              const SizedBox(height: 24),
+              
               // Book Now CTA
-              _buildBookNowSection(context, theme),
+              _buildBookNowSection(context, theme, ref),
             ],
           ),
         ),
@@ -51,15 +57,16 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              Icons.layers,
-              color: theme.colorScheme.onPrimary,
-              size: 32,
+            child: CustomPaint(
+              painter: HexagonLogoPainter(
+                primaryColor: theme.colorScheme.primary,
+                accentColor: const Color(0xFFFF6B9D), // Pink accent from logo
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -67,15 +74,26 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'LITHOX',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      'LITHOX',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    Text(
+                      '™',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
                 ),
                 Text(
-                  'Chemistry for Stones',
+                  'Chemistry for Stones • Since 1995',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     fontStyle: FontStyle.italic,
@@ -89,7 +107,7 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeroSection(BuildContext context, ThemeData theme) {
+  Widget _buildHeroSection(BuildContext context, ThemeData theme, WidgetRef ref) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -114,31 +132,25 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Premium Epoxy Flooring Solutions',
+            'Premium Epoxy Solutions & Flooring Systems',
             style: theme.textTheme.headlineSmall?.copyWith(
               color: theme.colorScheme.onPrimary,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
-            'Transform your space with high-quality, durable epoxy flooring that combines beauty with functionality.',
-            style: theme.textTheme.bodyMedium?.copyWith(
+            'Chemistry for Stones',
+            style: theme.textTheme.titleMedium?.copyWith(
               color: theme.colorScheme.onPrimary.withOpacity(0.9),
+              fontStyle: FontStyle.italic,
             ),
           ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () => context.go('/booking'),
-              style: FilledButton.styleFrom(
-                backgroundColor: theme.colorScheme.onPrimary,
-                foregroundColor: theme.colorScheme.primary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              icon: const Icon(Icons.calendar_today),
-              label: const Text('Book Now'),
+          const SizedBox(height: 8),
+          Text(
+            'Leading manufacturer and wholesaler of epoxy-based flooring systems, protective coatings, and adhesives across India. Delivering world-class solutions with over 30 years of expertise.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onPrimary.withOpacity(0.9),
             ),
           ),
         ],
@@ -168,12 +180,25 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Since 1995, Lithox has been a trusted leader in epoxy flooring solutions. We specialize in creating durable, beautiful, and long-lasting floors for residential, commercial, and industrial spaces.',
+            'LITHOX™ - Chemistry for Stones Since 1995',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Founded in 1995 by visionary chemical engineer, Mr. Manish Jain, an alumnus of IIT Mumbai, Lithox began its journey as a small-scale manufacturer with a big mission — to deliver world-class epoxy solutions tailored for India\'s growing industrial needs.',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 12),
           Text(
-            'Our commitment to quality and innovation has made us the preferred choice for thousands of satisfied customers across the region.',
+            'Today, Lithox stands tall as a leading manufacturer and wholesaler of epoxy-based flooring systems, protective coatings, and adhesives across India. With a legacy built on technical expertise, family-driven commitment, and constant innovation, Lithox continues to set new standards in the chemical manufacturing industry.',
+            style: theme.textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Under the dynamic leadership of the next generation — Mr. Hritvik Jain and Mr. Chinmay Jain — Lithox has expanded digitally, diversified product lines, and embraced smart manufacturing.',
             style: theme.textTheme.bodyMedium,
           ),
         ],
@@ -244,10 +269,10 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildWhyChooseUs(ThemeData theme) {
     final features = [
-      {'icon': Icons.star, 'title': 'Quality Materials', 'desc': 'Premium epoxy compounds'},
-      {'icon': Icons.people, 'title': 'Expert Team', 'desc': '25+ years experience'},
-      {'icon': Icons.schedule, 'title': 'Timely Delivery', 'desc': 'On-time project completion'},
-      {'icon': Icons.support_agent, 'title': '24/7 Support', 'desc': 'Always here to help'},
+      {'icon': Icons.engineering, 'title': 'Technical Expertise', 'desc': 'IIT Mumbai alumni leadership'},
+      {'icon': Icons.factory, 'title': 'Smart Manufacturing', 'desc': 'Advanced production facilities'},
+      {'icon': Icons.family_restroom, 'title': 'Family-Driven Commitment', 'desc': 'Multi-generational excellence'},
+      {'icon': Icons.lightbulb, 'title': 'Constant Innovation', 'desc': 'Leading industry standards'},
     ];
 
     return Column(
@@ -304,7 +329,128 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBookNowSection(BuildContext context, ThemeData theme) {
+  Widget _buildContactSection(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.2),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Contact Us',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Email
+          Row(
+            children: [
+              Icon(
+                Icons.email,
+                color: theme.colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Email',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Srijanmishram@gmail.com',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Phone
+          Row(
+            children: [
+              Icon(
+                Icons.phone,
+                color: theme.colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Phone',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '+91-90572 63521',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Address
+          Row(
+            children: [
+              Icon(
+                Icons.location_on,
+                color: theme.colorScheme.primary,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Address',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Opp. Radhika Palace, Inside UCO Bank Lane, NH-8 Sukher, Udaipur, Rajasthan-313004',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBookNowSection(BuildContext context, ThemeData theme, WidgetRef ref) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -340,7 +486,7 @@ class HomeScreen extends ConsumerWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: () => context.go('/booking'),
+              onPressed: () => ref.read(tabNavigationProvider.notifier).switchToBook(),
               style: FilledButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
@@ -360,10 +506,13 @@ class HomeScreen extends ConsumerWidget {
                 color: theme.colorScheme.onPrimaryContainer,
               ),
               const SizedBox(width: 8),
-              Text(
-                'No obligation • Free estimate',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7),
+              Flexible(
+                child: Text(
+                  'No obligation • Free estimate',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onPrimaryContainer.withOpacity(0.7),
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
@@ -372,4 +521,88 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+class HexagonLogoPainter extends CustomPainter {
+  final Color primaryColor;
+  final Color accentColor;
+
+  HexagonLogoPainter({required this.primaryColor, required this.accentColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width * 0.4;
+    
+    // Draw hexagon outline
+    final hexagonPaint = Paint()
+      ..color = primaryColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0;
+    
+    final hexagonPath = Path();
+    for (int i = 0; i < 6; i++) {
+      final angle = (i * 60) * (3.14159 / 180);
+      final x = center.dx + radius * cos(angle);
+      final y = center.dy + radius * sin(angle);
+      
+      if (i == 0) {
+        hexagonPath.moveTo(x, y);
+      } else {
+        hexagonPath.lineTo(x, y);
+      }
+    }
+    hexagonPath.close();
+    canvas.drawPath(hexagonPath, hexagonPaint);
+    
+    // Draw accent lines
+    final accentPaint = Paint()
+      ..color = accentColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5;
+    
+    // Top accent line
+    canvas.drawLine(
+      Offset(center.dx - radius * 0.7, center.dy - radius * 0.5),
+      Offset(center.dx + radius * 0.2, center.dy - radius * 0.5),
+      accentPaint,
+    );
+    
+    // Bottom accent line
+    canvas.drawLine(
+      Offset(center.dx - radius * 0.2, center.dy + radius * 0.5),
+      Offset(center.dx + radius * 0.7, center.dy + radius * 0.5),
+      accentPaint,
+    );
+    
+    // Draw stylized "L"
+    final letterPaint = Paint()
+      ..color = primaryColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0
+      ..strokeCap = StrokeCap.round;
+    
+    // Vertical line of L
+    canvas.drawLine(
+      Offset(center.dx - radius * 0.3, center.dy - radius * 0.3),
+      Offset(center.dx - radius * 0.3, center.dy + radius * 0.2),
+      letterPaint,
+    );
+    
+    // Horizontal line of L with curve
+    final curvePath = Path();
+    curvePath.moveTo(center.dx - radius * 0.3, center.dy + radius * 0.2);
+    curvePath.quadraticBezierTo(
+      center.dx + radius * 0.1, center.dy + radius * 0.2,
+      center.dx + radius * 0.3, center.dy - radius * 0.1,
+    );
+    
+    canvas.drawPath(curvePath, letterPaint);
+  }
+  
+  double cos(double angle) => math.cos(angle);
+  double sin(double angle) => math.sin(angle);
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

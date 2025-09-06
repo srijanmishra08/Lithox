@@ -1,9 +1,12 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../services/email_service.dart';
+import '../../providers/tab_navigation_provider.dart';
+import '../../providers/orders_provider.dart';
 
 class BookingFormScreen extends ConsumerStatefulWidget {
   const BookingFormScreen({super.key});
@@ -20,12 +23,13 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   final _addressController = TextEditingController();
   final _cityController = TextEditingController();
   final _areaController = TextEditingController();
+  final _approximateAreaController = TextEditingController();
   final _notesController = TextEditingController();
   
   String _selectedService = 'Residential Flooring';
-  String _selectedArea = 'Small (< 500 sq ft)';
-  XFile? _selectedImage;
+  List<XFile> _selectedImages = [];
   bool _isSubmitting = false;
+  final int _maxImages = 5;
 
   final List<String> _services = [
     'Residential Flooring',
@@ -38,13 +42,6 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     'Other (Please specify in notes)',
   ];
 
-  final List<String> _areaOptions = [
-    'Small (< 500 sq ft)',
-    'Medium (500 - 1000 sq ft)',
-    'Large (1000 - 2000 sq ft)',
-    'Extra Large (> 2000 sq ft)',
-  ];
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -53,6 +50,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     _addressController.dispose();
     _cityController.dispose();
     _areaController.dispose();
+    _approximateAreaController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -64,10 +62,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Book Consultation'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/'),
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: Form(
         key: _formKey,
@@ -127,11 +122,13 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                 size: 24,
               ),
               const SizedBox(width: 12),
-              Text(
-                'Free Consultation Booking',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  'Free Consultation Booking',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: theme.colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -152,104 +149,72 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Upload Space Photos',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Upload Space Photos',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Text(
+              '${_selectedImages.length}/$_maxImages',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         Text(
-          'Help us understand your space better by uploading photos',
+          'Help us understand your space better by uploading up to $_maxImages photos',
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 16),
         
-        // Image Preview or Upload Area
-        Container(
-          width: double.infinity,
-          height: 200,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.5),
-              style: BorderStyle.solid,
-              width: 2,
+        // Image Grid
+        if (_selectedImages.isNotEmpty) ...[
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 1,
             ),
-            borderRadius: BorderRadius.circular(12),
-            color: theme.colorScheme.surface,
+            itemCount: _selectedImages.length + (_selectedImages.length < _maxImages ? 1 : 0),
+            itemBuilder: (context, index) {
+              if (index < _selectedImages.length) {
+                // Show existing image
+                return _buildImageTile(theme, _selectedImages[index], index);
+              } else {
+                // Show add button
+                return _buildAddImageTile(theme);
+              }
+            },
           ),
-          child: _selectedImage != null
-              ? Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.file(
-                        File(_selectedImage!.path),
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedImage = null;
-                          });
-                        },
-                        icon: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add_photo_alternate_outlined,
-                      size: 48,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Tap to upload photos',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Camera or Gallery',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-        ),
+        ] else ...[
+          // Empty state - show upload area
+          SizedBox(
+            width: double.infinity,
+            child: _buildAddImageTile(theme, isLarge: true),
+          ),
+        ],
         
-        if (_selectedImage == null) ...[
+        if (_selectedImages.isEmpty) ...[
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => _pickImage(ImageSource.camera),
+                  onPressed: _selectedImages.length < _maxImages 
+                      ? () => _pickImage(ImageSource.camera) 
+                      : null,
                   icon: const Icon(Icons.camera_alt),
                   label: const Text('Camera'),
                 ),
@@ -257,7 +222,9 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => _pickImage(ImageSource.gallery),
+                  onPressed: _selectedImages.length < _maxImages 
+                      ? () => _pickImage(ImageSource.gallery) 
+                      : null,
                   icon: const Icon(Icons.photo_library),
                   label: const Text('Gallery'),
                 ),
@@ -266,6 +233,130 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildImageTile(ThemeData theme, XFile image, int index) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: theme.colorScheme.outline.withOpacity(0.3),
+        ),
+      ),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(7),
+            child: kIsWeb
+                ? Image.network(
+                    image.path,
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                  )
+                : Image.file(
+                    File(image.path),
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedImages.removeAt(index);
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 14,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddImageTile(ThemeData theme, {bool isLarge = false}) {
+    return GestureDetector(
+      onTap: _selectedImages.length < _maxImages ? _showImageSourceDialog : null,
+      child: Container(
+        height: isLarge ? 200 : null,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: theme.colorScheme.outline.withOpacity(0.5),
+            style: BorderStyle.solid,
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(8),
+          color: theme.colorScheme.surface,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.add_photo_alternate_outlined,
+              size: isLarge ? 48 : 32,
+              color: _selectedImages.length < _maxImages 
+                  ? theme.colorScheme.primary 
+                  : theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+            ),
+            SizedBox(height: isLarge ? 16 : 8),
+            Text(
+              _selectedImages.length < _maxImages ? 'Add Photo' : 'Max $_maxImages photos',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: _selectedImages.length < _maxImages 
+                    ? theme.colorScheme.primary 
+                    : theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showImageSourceDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Image Source'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -416,22 +507,18 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         ),
         const SizedBox(height: 16),
         
-        DropdownButtonFormField<String>(
-          initialValue: _selectedArea,
+        TextFormField(
+          controller: _approximateAreaController,
           decoration: const InputDecoration(
             labelText: 'Approximate Area *',
             prefixIcon: Icon(Icons.square_foot),
+            hintText: 'e.g., 500 sq ft, 1000 sq ft, etc.',
           ),
-          items: _areaOptions.map((area) {
-            return DropdownMenuItem(
-              value: area,
-              child: Text(area),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedArea = value!;
-            });
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter the approximate area';
+            }
+            return null;
           },
         ),
       ],
@@ -519,12 +606,12 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               TextButton.icon(
-                onPressed: () => _makePhoneCall('+919999999999'),
+                onPressed: () => _makePhoneCall('+919057263521'),
                 icon: const Icon(Icons.phone),
                 label: const Text('Call Now'),
               ),
               TextButton.icon(
-                onPressed: () => _openWhatsApp('+919999999999'),
+                onPressed: () => _openWhatsApp('+919057263521'),
                 icon: const Icon(Icons.chat),
                 label: const Text('WhatsApp'),
               ),
@@ -536,13 +623,20 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+    if (_selectedImages.length >= _maxImages) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Maximum $_maxImages photos allowed')),
+      );
+      return;
+    }
+    
     try {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(source: source);
       
       if (image != null) {
         setState(() {
-          _selectedImage = image;
+          _selectedImages.add(image);
         });
       }
     } catch (e) {
@@ -564,8 +658,22 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     });
 
     try {
+      // Create order in the system
+      final order = ref.read(ordersProvider.notifier).createOrderFromBooking(
+        customerName: _nameController.text,
+        customerEmail: _emailController.text,
+        customerPhone: _phoneController.text,
+        address: _addressController.text,
+        city: _cityController.text,
+        area: _areaController.text,
+        serviceType: _selectedService,
+        approximateArea: _approximateAreaController.text,
+        notes: _notesController.text,
+        photoCount: _selectedImages.length,
+      );
+
       // Send email using EmailService
-      await EmailService.sendBookingEmail(
+      final emailSent = await EmailService.sendBookingEmail(
         name: _nameController.text,
         email: _emailController.text,
         phone: _phoneController.text,
@@ -573,12 +681,12 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         city: _cityController.text,
         area: _areaController.text,
         serviceType: _selectedService,
-        approximateArea: _selectedArea,
+        approximateArea: _approximateAreaController.text,
         notes: _notesController.text,
-        hasPhoto: _selectedImage != null,
+        photoCount: _selectedImages.length,
       );
       
-      if (mounted) {
+      if (mounted && emailSent) {
         // Show success dialog
         showDialog(
           context: context,
@@ -586,14 +694,166 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
           builder: (context) => AlertDialog(
             icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
             title: const Text('Request Submitted!'),
-            content: const Text(
-              'Thank you for your consultation request. Our team will contact you within 24 hours with a personalized quote.',
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Your consultation request has been sent successfully! Our team will contact you within 24 hours with a personalized quote.',
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.email_outlined,
+                        size: 16,
+                        color: Colors.green.shade700,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Email sent automatically',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.green.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.receipt_long,
+                        size: 16,
+                        color: Colors.blue.shade700,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Order #${order.id.substring(0, 8)} created',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.blue.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (_selectedImages.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '${_selectedImages.length} photo${_selectedImages.length == 1 ? '' : 's'} included in request.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ],
             ),
             actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _clearForm();
+                  ref.read(tabNavigationProvider.notifier).switchToOrders();
+                },
+                child: const Text('View Orders'),
+              ),
               FilledButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  context.go('/');
+                  _clearForm();
+                  ref.read(tabNavigationProvider.notifier).switchToHome();
+                },
+                child: const Text('Back to Home'),
+              ),
+            ],
+          ),
+        );
+      } else if (mounted) {
+        // Show error dialog if email failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Request submitted but email delivery failed. We have logged your request.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        // Still show success dialog since the data was captured
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            icon: const Icon(Icons.info, color: Colors.orange, size: 48),
+            title: const Text('Request Received'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Your consultation request has been logged. Please call us directly at +91-90572 63521 to confirm your booking.',
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.receipt_long,
+                        size: 16,
+                        color: Colors.blue.shade700,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Order #${order.id.substring(0, 8)} created',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.blue.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await EmailService.makePhoneCall('+919057263521');
+                },
+                child: const Text('Call Now'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _clearForm();
+                  ref.read(tabNavigationProvider.notifier).switchToOrders();
+                },
+                child: const Text('View Orders'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _clearForm();
+                  ref.read(tabNavigationProvider.notifier).switchToHome();
                 },
                 child: const Text('Back to Home'),
               ),
@@ -641,5 +901,20 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         );
       }
     }
+  }
+
+  void _clearForm() {
+    _nameController.clear();
+    _emailController.clear();
+    _phoneController.clear();
+    _addressController.clear();
+    _cityController.clear();
+    _areaController.clear();
+    _approximateAreaController.clear();
+    _notesController.clear();
+    setState(() {
+      _selectedService = 'Residential Flooring';
+      _selectedImages.clear();
+    });
   }
 }

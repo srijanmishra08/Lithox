@@ -1,3 +1,9 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
 android {
     namespace "com.lithox.epoxy.lithox_epoxy_app"
     compileSdkVersion flutter.compileSdkVersion

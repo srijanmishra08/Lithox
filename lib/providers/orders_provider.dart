@@ -1,0 +1,131 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/order.dart';
+import '../services/order_service.dart';
+
+// Provider for all orders
+final ordersProvider = StateNotifierProvider<OrdersNotifier, List<Order>>((ref) {
+  return OrdersNotifier();
+});
+
+// Provider for a specific order by ID
+final orderByIdProvider = Provider.family<Order?, String>((ref, orderId) {
+  final orders = ref.watch(ordersProvider);
+  try {
+    return orders.firstWhere((order) => order.id == orderId);
+  } catch (e) {
+    return null;
+  }
+});
+
+// Provider for orders filtered by status
+final ordersByStatusProvider = Provider.family<List<Order>, OrderStatus>((ref, status) {
+  final orders = ref.watch(ordersProvider);
+  return orders.where((order) => order.status == status).toList();
+});
+
+// Provider for order statistics
+final orderStatsProvider = Provider<OrderStats>((ref) {
+  final orders = ref.watch(ordersProvider);
+  
+  int total = orders.length;
+  int completed = orders.where((o) => o.status == OrderStatus.completed).length;
+  int inProgress = orders.where((o) => o.status == OrderStatus.inProgress || o.status == OrderStatus.scheduled).length;
+  int pending = orders.where((o) => o.status == OrderStatus.submitted || o.status == OrderStatus.reviewed || o.status == OrderStatus.quoted).length;
+  
+  return OrderStats(
+    total: total,
+    completed: completed,
+    inProgress: inProgress,
+    pending: pending,
+  );
+});
+
+class OrdersNotifier extends StateNotifier<List<Order>> {
+  OrdersNotifier() : super([]) {
+    _loadOrders();
+  }
+
+  void _loadOrders() {
+    // Initialize with mock orders for demo
+    OrderService.generateMockOrders();
+    state = OrderService.getUserOrders();
+  }
+
+  // Add a new order
+  void addOrder(Order order) {
+    state = [...state, order];
+  }
+
+  // Update an existing order
+  void updateOrder(Order updatedOrder) {
+    state = state.map((order) {
+      return order.id == updatedOrder.id ? updatedOrder : order;
+    }).toList();
+  }
+
+  // Create order from booking
+  Order createOrderFromBooking({
+    required String customerName,
+    required String customerEmail,
+    required String customerPhone,
+    required String address,
+    required String city,
+    required String area,
+    required String serviceType,
+    required String approximateArea,
+    required String notes,
+    required int photoCount,
+  }) {
+    final order = OrderService.createOrder(
+      customerName: customerName,
+      customerEmail: customerEmail,
+      customerPhone: customerPhone,
+      address: address,
+      city: city,
+      area: area,
+      serviceType: serviceType,
+      approximateArea: approximateArea,
+      notes: notes,
+      photoCount: photoCount,
+    );
+    
+    addOrder(order);
+    return order;
+  }
+
+  // Update order status
+  void updateOrderStatus(String orderId, OrderStatus newStatus, {String? notes}) {
+    final success = OrderService.updateOrderStatus(orderId, newStatus, notes: notes);
+    if (success) {
+      refreshOrders();
+    }
+  }
+
+  // Refresh orders from service
+  void refreshOrders() {
+    state = OrderService.getUserOrders();
+  }
+
+  // Simulate real-time updates (for demo)
+  void startRealTimeUpdates() {
+    // Simulate periodic updates every 30 seconds
+    Future.delayed(const Duration(seconds: 30), () {
+      refreshOrders();
+      startRealTimeUpdates(); // Continue the cycle
+    });
+  }
+}
+
+class OrderStats {
+  final int total;
+  final int completed;
+  final int inProgress;
+  final int pending;
+
+  const OrderStats({
+    required this.total,
+    required this.completed,
+    required this.inProgress,
+    required this.pending,
+  });
+}
