@@ -113,3 +113,12 @@ coverage/
 
 # Development downloads
 flutter_macos.zip
+
+# Build artifacts
+*.apk
+*.aab
+*.ipa
+
+# Android build files
+android/.gradle/
+android/local.properties

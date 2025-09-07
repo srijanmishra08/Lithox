@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/order.dart';
 import '../providers/orders_provider.dart';
+import '../widgets/lithox_logo.dart';
 
 class OrdersScreen extends ConsumerStatefulWidget {
   const OrdersScreen({super.key});
@@ -27,7 +28,13 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Orders'),
+        title: Row(
+          children: [
+            const LithoxLogo.small(),
+            const SizedBox(width: 12),
+            const Text('My Orders'),
+          ],
+        ),
         backgroundColor: Colors.brown.shade700,
         foregroundColor: Colors.white,
         elevation: 0,

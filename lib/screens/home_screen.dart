@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/tab_navigation_provider.dart';
+import '../widgets/lithox_logo.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -55,18 +56,9 @@ class HomeScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: CustomPaint(
-              painter: HexagonLogoPainter(
-                primaryColor: theme.colorScheme.primary,
-                accentColor: const Color(0xFFFF6B9D), // Pink accent from logo
-              ),
-            ),
+          // Lithox Logo
+          const LithoxLogo.medium(
+            padding: EdgeInsets.all(8),
           ),
           const SizedBox(width: 16),
           Expanded(

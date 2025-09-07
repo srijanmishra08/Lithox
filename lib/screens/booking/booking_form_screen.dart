@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../services/email_service.dart';
+import '../../services/contact_service.dart';
 import '../../providers/tab_navigation_provider.dart';
 import '../../providers/orders_provider.dart';
+import '../../widgets/lithox_logo.dart';
 
 class BookingFormScreen extends ConsumerStatefulWidget {
   const BookingFormScreen({super.key});
@@ -60,7 +62,13 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Book Consultation'),
+        title: Row(
+          children: [
+            const LithoxLogo.small(),
+            const SizedBox(width: 12),
+            const Text('Book Consultation'),
+          ],
+        ),
         automaticallyImplyLeading: false,
       ),
       body: Form(
@@ -836,7 +844,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               TextButton(
                 onPressed: () async {
                   Navigator.of(context).pop();
-                  await EmailService.makePhoneCall('+919057263521');
+                  await ContactService.makePhoneCall('+919057263521');
                 },
                 child: const Text('Call Now'),
               ),
@@ -877,11 +885,15 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
 
   Future<void> _makePhoneCall(String phoneNumber) async {
     try {
-      await EmailService.makePhoneCall(phoneNumber);
+      await ContactService.makePhoneCall(phoneNumber);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not make phone call: $e')),
+          SnackBar(
+            content: Text('Could not make phone call: ${e.toString().replaceAll('Exception: ', '')}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     }
@@ -889,14 +901,18 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
 
   Future<void> _openWhatsApp(String phoneNumber) async {
     try {
-      await EmailService.openWhatsApp(
+      await ContactService.openWhatsApp(
         phoneNumber,
         message: 'Hi, I am interested in Lithox epoxy flooring services.',
       );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not open WhatsApp: $e')),
+          SnackBar(
+            content: Text('Could not open WhatsApp: ${e.toString().replaceAll('Exception: ', '')}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     }
