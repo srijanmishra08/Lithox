@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 import '../models/order.dart';
 
@@ -247,7 +246,6 @@ class OrderService {
 
   // Helper methods
   static String _generateOrderId() {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
     final random = _random.nextInt(999);
     return 'LTX-${DateTime.now().year}-${random.toString().padLeft(3, '0')}';
   }
