@@ -31,7 +31,7 @@ class AppConstants {
   
   // Contact Information
   static const String businessPhone = '+919057263521';
-  static const String businessEmail = 'faizan.mdprince@gmail.com';
+  static const String businessEmail = 'srijanmishram@gmail.com';
   static const String companyName = 'Lithox Epoxy';
   
   // Private constructor to prevent instantiation

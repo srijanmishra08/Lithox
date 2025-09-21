@@ -221,7 +221,7 @@ class HomeScreen extends ConsumerWidget {
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.home_work,
                           size: 32,
                           color: Colors.white,
@@ -816,7 +816,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
               ],
             ),
-          )).toList(),
+          )),
         ],
       ),
     );
@@ -852,7 +852,7 @@ class HomeScreen extends ConsumerWidget {
               color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.phone_in_talk,
               size: 40,
               color: Colors.white,

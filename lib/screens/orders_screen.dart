@@ -179,10 +179,10 @@ class OrdersScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           OutlinedButton.icon(
-            onPressed: () {
+            onPressed: () async {
               // Force generate mock orders for testing
-              OrderService.generateMockOrders();
-              ref.read(ordersProvider.notifier).refreshOrders();
+              await OrderService.generateMockOrders();
+              await ref.read(ordersProvider.notifier).refreshOrders();
             },
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -703,25 +703,25 @@ class OrdersScreen extends ConsumerWidget {
                         );
                       },
                       borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Row(
                           children: [
-                            const Icon(Icons.phone, color: Colors.green),
-                            const SizedBox(width: 12),
+                            Icon(Icons.phone, color: Colors.green),
+                            SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Call Us',
                                     style: TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  const Text('+91-90572 63521'),
+                                  Text('+91-90572 63521'),
                                 ],
                               ),
                             ),
-                            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                            Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
                           ],
                         ),
                       ),

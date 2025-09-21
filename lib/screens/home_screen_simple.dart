@@ -12,11 +12,11 @@ class HomeScreen extends ConsumerWidget {
     
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
           children: [
-            const LithoxLogo.small(),
-            const SizedBox(width: 12),
-            const Text('Lithox Epoxy'),
+            LithoxLogo.small(),
+            SizedBox(width: 12),
+            Text('Lithox Epoxy'),
           ],
         ),
         backgroundColor: theme.colorScheme.primary,
@@ -157,19 +157,19 @@ class HomeScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(Icons.phone, size: 20),
-                        const SizedBox(width: 12),
-                        const Text('+91-90572 63521'),
+                        Icon(Icons.phone, size: 20),
+                        SizedBox(width: 12),
+                        Text('+91-90572 63521'),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Row(
+                    const Row(
                       children: [
-                        const Icon(Icons.email, size: 20),
-                        const SizedBox(width: 12),
-                        const Text('faizan.mdprince@gmail.com'),
+                        Icon(Icons.email, size: 20),
+                        SizedBox(width: 12),
+                        Text('faizan.mdprince@gmail.com'),
                       ],
                     ),
                   ],

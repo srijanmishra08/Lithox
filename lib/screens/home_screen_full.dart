@@ -813,7 +813,7 @@ class HomeScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.chat,
                     color: Colors.green,
                     size: 20,

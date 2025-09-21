@@ -45,10 +45,11 @@ class OrdersNotifier extends StateNotifier<List<Order>> {
     _loadOrders();
   }
 
-  void _loadOrders() {
+  void _loadOrders() async {
     // Initialize with mock orders for demo
-    OrderService.generateMockOrders();
-    state = OrderService.getUserOrders();
+    await OrderService.generateMockOrders();
+    final orders = await OrderService.getUserOrders();
+    state = orders;
   }
 
   // Add a new order
@@ -64,7 +65,7 @@ class OrdersNotifier extends StateNotifier<List<Order>> {
   }
 
   // Create order from booking
-  Order createOrderFromBooking({
+  Future<Order> createOrderFromBooking({
     required String customerName,
     required String customerEmail,
     required String customerPhone,
@@ -75,8 +76,8 @@ class OrdersNotifier extends StateNotifier<List<Order>> {
     required String approximateArea,
     required String notes,
     required int photoCount,
-  }) {
-    final order = OrderService.createOrder(
+  }) async {
+    final order = await OrderService.createOrder(
       customerName: customerName,
       customerEmail: customerEmail,
       customerPhone: customerPhone,
@@ -94,16 +95,17 @@ class OrdersNotifier extends StateNotifier<List<Order>> {
   }
 
   // Update order status
-  void updateOrderStatus(String orderId, OrderStatus newStatus, {String? notes}) {
-    final success = OrderService.updateOrderStatus(orderId, newStatus, notes: notes);
+  void updateOrderStatus(String orderId, OrderStatus newStatus, {String? notes}) async {
+    final success = await OrderService.updateOrderStatus(orderId, newStatus, notes: notes);
     if (success) {
-      refreshOrders();
+      await refreshOrders();
     }
   }
 
   // Refresh orders from service
-  void refreshOrders() {
-    state = OrderService.getUserOrders();
+  Future<void> refreshOrders() async {
+    final orders = await OrderService.getUserOrders();
+    state = orders;
   }
 
   // Simulate real-time updates (for demo)

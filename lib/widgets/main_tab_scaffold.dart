@@ -4,7 +4,6 @@ import '../screens/home_screen_full.dart';
 import '../screens/booking/booking_form_screen.dart';
 import '../screens/orders_screen.dart';
 import '../providers/tab_navigation_provider.dart';
-import 'lithox_logo.dart';
 
 class MainTabScaffold extends ConsumerWidget {
   const MainTabScaffold({super.key});

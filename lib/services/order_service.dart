@@ -1,12 +1,12 @@
 import 'dart:math';
 import '../models/order.dart';
+import 'database_service.dart';
 
 class OrderService {
-  static final List<Order> _orders = [];
   static final Random _random = Random();
 
   // Create a new order from booking submission
-  static Order createOrder({
+  static Future<Order> createOrder({
     required String customerName,
     required String customerEmail,
     required String customerPhone,
@@ -17,7 +17,7 @@ class OrderService {
     required String approximateArea,
     required String notes,
     required int photoCount,
-  }) {
+  }) async {
     final orderId = _generateOrderId();
     final order = Order(
       id: orderId,
@@ -44,7 +44,8 @@ class OrderService {
       ],
     );
 
-    _orders.add(order);
+    // Save to database
+    await DatabaseService.insertOrder(order);
     
     // Simulate automatic status updates
     _simulateOrderProgress(orderId);
@@ -53,26 +54,20 @@ class OrderService {
   }
 
   // Get all orders for the current user
-  static List<Order> getUserOrders() {
-    // In a real app, this would filter by user ID
-    return List.from(_orders);
+  static Future<List<Order>> getUserOrders() async {
+    return await DatabaseService.getAllOrders();
   }
 
   // Get order by ID
-  static Order? getOrderById(String orderId) {
-    try {
-      return _orders.firstWhere((order) => order.id == orderId);
-    } catch (e) {
-      return null;
-    }
+  static Future<Order?> getOrderById(String orderId) async {
+    return await DatabaseService.getOrderById(orderId);
   }
 
   // Update order status
-  static bool updateOrderStatus(String orderId, OrderStatus newStatus, {String? notes}) {
-    final orderIndex = _orders.indexWhere((order) => order.id == orderId);
-    if (orderIndex == -1) return false;
+  static Future<bool> updateOrderStatus(String orderId, OrderStatus newStatus, {String? notes}) async {
+    final order = await DatabaseService.getOrderById(orderId);
+    if (order == null) return false;
 
-    final order = _orders[orderIndex];
     final update = OrderUpdate(
       id: _generateUpdateId(),
       timestamp: DateTime.now(),
@@ -88,16 +83,15 @@ class OrderService {
       completedDate: newStatus == OrderStatus.completed ? DateTime.now() : order.completedDate,
     );
 
-    _orders[orderIndex] = updatedOrder;
+    await DatabaseService.updateOrder(updatedOrder);
     return true;
   }
 
   // Add cost estimate to order
-  static bool addCostEstimate(String orderId, double estimatedCost) {
-    final orderIndex = _orders.indexWhere((order) => order.id == orderId);
-    if (orderIndex == -1) return false;
+  static Future<bool> addCostEstimate(String orderId, double estimatedCost) async {
+    final order = await DatabaseService.getOrderById(orderId);
+    if (order == null) return false;
 
-    final order = _orders[orderIndex];
     final update = OrderUpdate(
       id: _generateUpdateId(),
       timestamp: DateTime.now(),
@@ -112,13 +106,14 @@ class OrderService {
       updates: [...order.updates, update],
     );
 
-    _orders[orderIndex] = updatedOrder;
+    await DatabaseService.updateOrder(updatedOrder);
     return true;
   }
 
   // Generate mock orders for demonstration
-  static void generateMockOrders() {
-    if (_orders.isNotEmpty) return; // Don't generate if orders already exist
+  static Future<void> generateMockOrders() async {
+    final existingOrders = await DatabaseService.getAllOrders();
+    if (existingOrders.isNotEmpty) return; // Don't generate if orders already exist
 
     final mockOrders = [
       Order(
@@ -226,21 +221,24 @@ class OrderService {
       ),
     ];
 
-    _orders.addAll(mockOrders);
+    // Save mock orders to database
+    for (final order in mockOrders) {
+      await DatabaseService.insertOrder(order);
+    }
   }
 
   // Simulate order progress for demo purposes
   static void _simulateOrderProgress(String orderId) {
     // Simulate review after 10 seconds
-    Future.delayed(const Duration(seconds: 10), () {
-      updateOrderStatus(orderId, OrderStatus.reviewed, 
+    Future.delayed(const Duration(seconds: 10), () async {
+      await updateOrderStatus(orderId, OrderStatus.reviewed, 
         notes: 'Our expert team has reviewed your requirements.');
     });
 
     // Simulate quote after 30 seconds
-    Future.delayed(const Duration(seconds: 30), () {
+    Future.delayed(const Duration(seconds: 30), () async {
       final cost = _random.nextDouble() * 50000 + 20000; // Random cost between 20k-70k
-      addCostEstimate(orderId, cost);
+      await addCostEstimate(orderId, cost);
     });
   }
 
@@ -255,7 +253,7 @@ class OrderService {
   }
 
   // Clear all orders (for testing)
-  static void clearOrders() {
-    _orders.clear();
+  static Future<void> clearOrders() async {
+    await DatabaseService.clearAllOrders();
   }
 }

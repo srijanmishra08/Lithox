@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../services/email_service.dart';
+import '../../services/real_email_service.dart';
 import '../../services/android_image_optimization_service.dart';
 import '../../providers/tab_navigation_provider.dart';
 import '../../providers/orders_provider.dart';
@@ -29,7 +29,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   final _notesController = TextEditingController();
   
   String _selectedService = 'Residential Flooring';
-  List<XFile> _selectedImages = [];
+  final List<XFile> _selectedImages = [];
   bool _isSubmitting = false;
   final int _maxImages = AppConstants.maxImagesPerForm;
 
@@ -844,7 +844,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
           const SizedBox(height: 20),
           
           DropdownButtonFormField<String>(
-            value: _selectedService,
+            initialValue: _selectedService,
             decoration: InputDecoration(
               labelText: 'Service Type *',
               prefixIcon: const Icon(Icons.home_repair_service),
@@ -1067,7 +1067,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Email: faizan.mdprince@gmail.com',
+                'Email: srijanmishram@gmail.com',
                 style: theme.textTheme.bodyMedium,
               ),
             ],
@@ -1115,7 +1115,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
 
     try {
       // Create order for tracking
-      final order = ref.read(ordersProvider.notifier).createOrderFromBooking(
+      final order = await ref.read(ordersProvider.notifier).createOrderFromBooking(
         customerName: _nameController.text,
         customerEmail: _emailController.text,
         customerPhone: _phoneController.text,
@@ -1128,8 +1128,8 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         photoCount: _selectedImages.length,
       );
 
-      // Send email
-      final emailSent = await EmailService.sendBookingEmail(
+      // Send email using real email service
+      final emailSent = await RealEmailService.sendBookingEmail(
         name: _nameController.text,
         email: _emailController.text,
         phone: _phoneController.text,
@@ -1148,7 +1148,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            icon: Icon(
+            icon: const Icon(
               Icons.mail_outline,
               color: Colors.green,
               size: 48,
@@ -1249,7 +1249,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            icon: Icon(
+            icon: const Icon(
               Icons.check_circle,
               color: Colors.green,
               size: 48,
