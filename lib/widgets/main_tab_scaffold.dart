@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../screens/home_screen_full.dart';
+import '../screens/home_screen.dart';
 import '../screens/booking/booking_form_screen.dart';
 import '../screens/orders_screen.dart';
 import '../providers/tab_navigation_provider.dart';
+import '../utils/app_constants.dart';
 
 class MainTabScaffold extends ConsumerWidget {
   const MainTabScaffold({super.key});
@@ -33,22 +34,41 @@ class MainTabScaffold extends ConsumerWidget {
   }
 
   Widget _buildBottomNav(ThemeData theme, int currentIndex, WidgetRef ref) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
+    return IntrinsicHeight(
+      child: Container(
+        constraints: const BoxConstraints(
+          minHeight: 60,
+          maxHeight: 80,
+        ),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              AppConstants.cardSurface,
+              AppConstants.surfaceLight,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-        ],
-      ),
-      child: SafeArea(
-        child: Container(
-          height: 80,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Row(
+          boxShadow: [
+            BoxShadow(
+              color: AppConstants.shadowColor.withValues(alpha: 0.08),
+              blurRadius: 32,
+              offset: const Offset(0, -8),
+            ),
+            BoxShadow(
+              color: AppConstants.primaryPurple.withValues(alpha: 0.05),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
+            child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildNavItem(
@@ -80,6 +100,7 @@ class MainTabScaffold extends ConsumerWidget {
               ),
             ],
           ),
+          ),
         ),
       ),
     );
@@ -99,13 +120,39 @@ class MainTabScaffold extends ConsumerWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOutCubic,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12.0,
+          vertical: 8.0,
+        ),
         decoration: BoxDecoration(
-          color: isSelected 
-            ? theme.colorScheme.primary.withOpacity(0.1)
-            : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [
+                    AppConstants.primaryPurple.withValues(alpha: 0.15),
+                    AppConstants.primaryPurple.withValues(alpha: 0.08),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(AppConstants.radiusRounded),
+          border: isSelected
+              ? Border.all(
+                  color: AppConstants.primaryPurple.withValues(alpha: 0.2),
+                  width: 1,
+                )
+              : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppConstants.primaryPurple.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -118,10 +165,10 @@ class MainTabScaffold extends ConsumerWidget {
                 color: isSelected 
                   ? theme.colorScheme.primary 
                   : theme.colorScheme.onSurfaceVariant,
-                size: 24,
+                size: 20,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: theme.textTheme.bodySmall!.copyWith(

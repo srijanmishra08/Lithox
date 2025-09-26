@@ -1,7 +1,9 @@
 import 'dart:async';
-import 'package:sqflite/sqflite.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import '../models/order.dart';
+import 'web_storage_service.dart';
 
 class DatabaseService {
   static Database? _database;
@@ -19,6 +21,23 @@ class DatabaseService {
   }
 
   static Future<Database> _initDatabase() async {
+    // For web platform, we'll use in-memory storage or fallback
+    if (kIsWeb) {
+      // For web, we'll use a simple in-memory database
+      // In a real web app, you might want to use IndexedDB or local storage
+      throw UnsupportedError('Database not supported on web platform');
+    }
+    
+    // Ensure database factory is initialized for non-web platforms
+    try {
+      // Initialize sqflite_common_ffi if not already done
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    } catch (e) {
+      // Database factory should already be initialized in main.dart
+      // This is a fallback in case it wasn't
+    }
+    
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, _databaseName);
 
@@ -74,6 +93,11 @@ class DatabaseService {
 
   // CRUD Operations for Orders
   static Future<void> insertOrder(Order order) async {
+    if (kIsWeb) {
+      await WebStorageService.insertOrder(order);
+      return;
+    }
+    
     final db = await database;
     
     // Insert order
@@ -119,6 +143,10 @@ class DatabaseService {
   }
 
   static Future<List<Order>> getAllOrders() async {
+    if (kIsWeb) {
+      return await WebStorageService.loadOrders();
+    }
+    
     final db = await database;
     
     final orderMaps = await db.query(
@@ -179,6 +207,10 @@ class DatabaseService {
   }
 
   static Future<Order?> getOrderById(String orderId) async {
+    if (kIsWeb) {
+      return await WebStorageService.getOrderById(orderId);
+    }
+    
     final db = await database;
     
     final orderMaps = await db.query(
@@ -237,6 +269,11 @@ class DatabaseService {
   }
 
   static Future<void> updateOrder(Order order) async {
+    if (kIsWeb) {
+      await WebStorageService.updateOrder(order);
+      return;
+    }
+    
     final db = await database;
     
     // Update order
@@ -287,6 +324,11 @@ class DatabaseService {
   }
 
   static Future<void> deleteOrder(String orderId) async {
+    if (kIsWeb) {
+      await WebStorageService.deleteOrder(orderId);
+      return;
+    }
+    
     final db = await database;
     
     // Delete order updates first (due to foreign key constraint)
@@ -305,6 +347,11 @@ class DatabaseService {
   }
 
   static Future<void> clearAllOrders() async {
+    if (kIsWeb) {
+      await WebStorageService.clearOrders();
+      return;
+    }
+    
     final db = await database;
     
     await db.delete(_orderUpdatesTable);

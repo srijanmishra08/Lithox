@@ -111,9 +111,9 @@ class OrderService {
   }
 
   // Generate mock orders for demonstration
-  static Future<void> generateMockOrders() async {
+  static Future<void> generateMockOrders({bool forceGenerate = false}) async {
     final existingOrders = await DatabaseService.getAllOrders();
-    if (existingOrders.isNotEmpty) return; // Don't generate if orders already exist
+    if (existingOrders.isNotEmpty && !forceGenerate) return; // Don't generate if orders already exist unless forced
 
     final mockOrders = [
       Order(
@@ -255,5 +255,15 @@ class OrderService {
   // Clear all orders (for testing)
   static Future<void> clearOrders() async {
     await DatabaseService.clearAllOrders();
+  }
+
+  // Remove mock orders only
+  static Future<void> removeMockOrders() async {
+    // Delete the specific mock orders by their IDs
+    const mockOrderIds = ['LTX-2025-001', 'LTX-2025-002'];
+    
+    for (final orderId in mockOrderIds) {
+      await DatabaseService.deleteOrder(orderId);
+    }
   }
 }

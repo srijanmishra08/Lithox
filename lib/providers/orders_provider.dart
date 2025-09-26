@@ -46,8 +46,7 @@ class OrdersNotifier extends StateNotifier<List<Order>> {
   }
 
   void _loadOrders() async {
-    // Initialize with mock orders for demo
-    await OrderService.generateMockOrders();
+    // Load user orders from database
     final orders = await OrderService.getUserOrders();
     state = orders;
   }
@@ -106,6 +105,12 @@ class OrdersNotifier extends StateNotifier<List<Order>> {
   Future<void> refreshOrders() async {
     final orders = await OrderService.getUserOrders();
     state = orders;
+  }
+
+  // Remove mock orders and refresh
+  Future<void> removeMockOrders() async {
+    await OrderService.removeMockOrders();
+    await refreshOrders();
   }
 
   // Simulate real-time updates (for demo)

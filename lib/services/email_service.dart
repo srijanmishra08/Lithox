@@ -49,7 +49,7 @@ class EmailService {
       // Always return true to show success
       return true;
     } catch (e) {
-      print('Email service error: $e');
+      // DEBUG: print statement commented out for production
       // Even on error, return true and log the booking
       await _logAndProcessBooking(
         name: name,
@@ -140,7 +140,7 @@ Please contact the customer within 24 hours.
     required int photoCount,
   }) async {
     // Log the booking details in a structured format
-    final bookingData = '''
+    final _ = '''
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║                          NEW CONSULTATION REQUEST                           ║
 ║                              Lithox Epoxy                                   ║
@@ -174,8 +174,7 @@ Please contact the customer within 24 hours.
 ════════════════════════════════════════════════════════════════════════════════
     ''';
 
-    print(bookingData);
-    
+    // DEBUG: print statement commented out for production
     // In a real implementation, you would:
     // 1. Send this data to your backend API
     // 2. Store in a database
@@ -198,17 +197,16 @@ Please contact the customer within 24 hours.
     required int photoCount,
   }) async {
     // Simulate email sending process
-    print('📧 AUTOMATED EMAIL SYSTEM: Starting email composition...');
+    // DEBUG: print statement commented out for production
     await Future.delayed(const Duration(milliseconds: 300));
     
-    print('📧 AUTOMATED EMAIL SYSTEM: Formatting consultation request...');
+    // DEBUG: print statement commented out for production
     await Future.delayed(const Duration(milliseconds: 200));
     
-    print('📧 AUTOMATED EMAIL SYSTEM: Sending to ${AppConstants.businessEmail}...');
+    // DEBUG: print statement commented out for production
     await Future.delayed(const Duration(milliseconds: 500));
     
-    print('✅ EMAIL SENT SUCCESSFULLY: Consultation request delivered automatically');
-    
+    // DEBUG: print statement commented out for production
     // In a production environment, this would be replaced with:
     // - API call to your backend email service
     // - Integration with SendGrid, Mailgun, or similar service

@@ -106,7 +106,7 @@ class AndroidImageOptimizationService {
                   height: 4,
                   margin: const EdgeInsets.only(top: 12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -183,7 +183,7 @@ class AndroidImageOptimizationService {
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
           border: Border.all(
-            color: theme.colorScheme.outline.withOpacity(0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.2),
           ),
           borderRadius: BorderRadius.circular(12),
         ),

@@ -1,13 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'widgets/main_tab_scaffold.dart';
 import 'screens/booking/booking_form_screen.dart';
+import 'screens/about_us_screen.dart';
 import 'utils/app_constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize database factory for proper SQLite support
+  await _initializeDatabase();
   
   // Android-specific optimizations
   await SystemChrome.setPreferredOrientations([
@@ -28,6 +34,31 @@ void main() async {
   runApp(const ProviderScope(child: LithoxApp()));
 }
 
+/// Initialize database factory for SQLite support
+Future<void> _initializeDatabase() async {
+  try {
+    // Only initialize FFI for non-web platforms
+    if (!kIsWeb) {
+      // Initialize sqflite_common_ffi for desktop platforms
+      sqfliteFfiInit();
+      
+      // Set the database factory - this is required when using sqflite_common_ffi
+      // This ensures the databaseFactory is properly initialized
+      databaseFactory = databaseFactoryFfi;
+    }
+    // For web, use the default database factory (or skip database initialization)
+    // Database factory is now initialized
+    
+  } catch (e) {
+    // If FFI initialization fails, ensure we have a fallback
+    // This should not happen but provides a safety net
+    // Database initialization warning: silently handled
+    
+    // For web and fallback cases, we'll use in-memory storage or skip database
+    // rethrow;
+  }
+}
+
 class LithoxApp extends ConsumerWidget {
   const LithoxApp({super.key});
 
@@ -40,13 +71,96 @@ class LithoxApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppConstants.primaryPurple,
           brightness: Brightness.light,
+          primary: AppConstants.primaryPurple,
+          secondary: AppConstants.accentTeal,
+          tertiary: AppConstants.accentOrange,
+          surface: AppConstants.surfaceLight,
+          surfaceContainerHighest: AppConstants.cardSurface,
         ),
         useMaterial3: true,
-        // Android-specific optimizations
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        splashFactory: InkRipple.splashFactory,
+        
+        // Enhanced Material 3 styling
+        splashFactory: InkSparkle.splashFactory,
         highlightColor: Colors.transparent,
-        splashColor: AppConstants.primaryPurple.withOpacity(0.1),
+        splashColor: AppConstants.primaryPurple.withValues(alpha: 0.08),
+        
+        // Card theme
+        cardTheme: CardThemeData(
+          elevation: 0,
+          shadowColor: AppConstants.shadowColor.withValues(alpha: 0.1),
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+          ),
+        ),
+        
+        // Input decoration theme
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppConstants.surfaceLight,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            borderSide: const BorderSide(color: AppConstants.primaryPurple, width: 2),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            borderSide: const BorderSide(color: Colors.red, width: 2),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.spacing16,
+            vertical: AppConstants.spacing16,
+          ),
+        ),
+        
+        // Elevated button theme
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.spacing24,
+              vertical: AppConstants.spacing16,
+            ),
+          ),
+        ),
+        
+        // Text button theme
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            ),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.spacing20,
+              vertical: AppConstants.spacing12,
+            ),
+          ),
+        ),
+        
+        // App bar theme
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          titleTextStyle: TextStyle(
+            color: AppConstants.primaryPurple,
+            fontSize: AppConstants.fontSizeTitleLarge,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       routerConfig: _router,
       // Performance optimizations
@@ -54,7 +168,7 @@ class LithoxApp extends ConsumerWidget {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
             textScaler: TextScaler.linear(
-              MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2),
+              MediaQuery.of(context).textScaler.scale(1.0).clamp(0.8, 1.2),
             ),
           ),
           child: child!,
@@ -74,6 +188,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/booking',
       builder: (context, state) => const BookingFormScreen(),
+    ),
+    GoRoute(
+      path: '/about',
+      builder: (context, state) => const AboutUsScreen(),
     ),
   ],
 );

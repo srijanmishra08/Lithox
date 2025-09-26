@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../services/real_email_service.dart';
+import '../../services/simple_email_service.dart';
 import '../../services/android_image_optimization_service.dart';
 import '../../providers/tab_navigation_provider.dart';
 import '../../providers/orders_provider.dart';
@@ -41,7 +41,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     'Basement Flooring',
     'Kitchen Flooring',
     'Bathroom Flooring',
-    'Other (Please specify in notes)',
+    'Other',
   ];
 
   @override
@@ -63,44 +63,61 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     
     return Scaffold(
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
-          // Enhanced App Bar
+          // Enhanced Modern App Bar
           SliverAppBar(
-            expandedHeight: 120,
+            expandedHeight: 140,
             floating: false,
             pinned: true,
             backgroundColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary,
-                      theme.colorScheme.primary.withOpacity(0.8),
-                    ],
+                  gradient: const LinearGradient(
+                    colors: AppConstants.heroGradient,
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppConstants.primaryPurple.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(24.0),
                     child: Row(
                       children: [
-                        Container(
+                        AnimatedContainer(
+                          duration: AppConstants.standardAnimationDuration,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white.withValues(alpha: 0.2),
+                                Colors.white.withValues(alpha: 0.1),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.3),
+                              width: 2,
+                            ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
                               ),
                             ],
                           ),
+                          padding: const EdgeInsets.all(8.0),
                           child: const LithoxLogo.small(),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 20.0),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +133,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                               Text(
                                 'Free Expert Advice',
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                 ),
                               ),
                             ],
@@ -131,58 +148,61 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
             automaticallyImplyLeading: false,
           ),
           
-          // Main content
+          // Main content with SafeArea to handle bottom navigation
           SliverToBoxAdapter(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  // Header
-                  _buildHeader(theme),
-                  const SizedBox(height: 24),
-                  
-                  // Image Upload Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: _buildImageUploadSection(theme),
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Personal Information
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: _buildPersonalInfoSection(theme),
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Project Details
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: _buildProjectDetailsSection(theme),
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Additional Notes
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: _buildNotesSection(theme),
-                  ),
-                  const SizedBox(height: 32),
-                  
-                  // Submit Button
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: _buildSubmitButton(theme),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Contact Info
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: _buildContactInfo(theme),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+            child: SafeArea(
+              minimum: const EdgeInsets.only(bottom: 80), // Account for bottom navigation
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    // Header
+                    _buildHeader(theme),
+                    const SizedBox(height: 20),
+                    
+                    // Image Upload Section
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: _buildImageUploadSection(theme),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    // Personal Information
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: _buildPersonalInfoSection(theme),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    // Project Details
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: _buildProjectDetailsSection(theme),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    // Additional Notes
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: _buildNotesSection(theme),
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // Submit Button
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: _buildSubmitButton(theme),
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // Contact Info
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: _buildContactInfo(theme),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
           ),
@@ -192,21 +212,25 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   }
 
   Widget _buildHeader(ThemeData theme) {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
+    return AnimatedContainer(
+      duration: AppConstants.standardAnimationDuration,
+      margin: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(24.0),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            theme.colorScheme.primary.withOpacity(0.1),
-            theme.colorScheme.primary.withOpacity(0.05),
+            AppConstants.primaryPurple.withValues(alpha: 0.08),
+            AppConstants.accentTeal.withValues(alpha: 0.05),
+            AppConstants.surfaceLight,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppConstants.radiusRounded),
+        boxShadow: AppConstants.shadowMedium,
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
+          color: AppConstants.primaryPurple.withValues(alpha: 0.15),
+          width: 1,
         ),
       ),
       child: Column(
@@ -217,7 +241,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -241,7 +265,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                     Text(
                       'Expert advice within 24 hours',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.primary.withOpacity(0.7),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -261,9 +285,13 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
           const SizedBox(height: 16),
           Row(
             children: [
-              _buildFeatureBadge(theme, Icons.check_circle, 'Free Consultation'),
-              const SizedBox(width: 12),
-              _buildFeatureBadge(theme, Icons.schedule, '24 Hour Response'),
+              Flexible(
+                child: _buildFeatureBadge(theme, Icons.check_circle, 'Free Consultation'),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: _buildFeatureBadge(theme, Icons.schedule, '24 Hour Response'),
+              ),
             ],
           ),
         ],
@@ -275,10 +303,10 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withOpacity(0.1),
+        color: theme.colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.3),
+          color: theme.colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -289,12 +317,16 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
             size: 14,
             color: theme.colorScheme.primary,
           ),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.primary,
-              fontWeight: FontWeight.w500,
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              text,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.w500,
+                fontSize: 11,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -303,18 +335,31 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   }
 
   Widget _buildImageUploadSection(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(20),
+    return AnimatedContainer(
+      duration: AppConstants.standardAnimationDuration,
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [
+            AppConstants.cardSurface,
+            AppConstants.surfaceLight.withValues(alpha: 0.8),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
         boxShadow: [
+          ...AppConstants.shadowMedium,
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppConstants.accentTeal.withValues(alpha: 0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
           ),
         ],
+        border: Border.all(
+          color: AppConstants.primaryPurple.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,7 +369,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -345,7 +390,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -440,7 +485,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.3),
+          color: theme.colorScheme.outline.withValues(alpha: 0.3),
         ),
       ),
       child: Stack(
@@ -473,7 +518,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.8),
+                  color: Colors.red.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -496,7 +541,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         height: isLarge ? 200 : null,
         decoration: BoxDecoration(
           border: Border.all(
-            color: theme.colorScheme.outline.withOpacity(0.5),
+            color: theme.colorScheme.outline.withValues(alpha: 0.5),
             style: BorderStyle.solid,
             width: 1,
           ),
@@ -511,7 +556,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               size: isLarge ? 48 : 32,
               color: _selectedImages.length < _maxImages 
                   ? theme.colorScheme.primary 
-                  : theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
             ),
             SizedBox(height: isLarge ? 16 : 8),
             Text(
@@ -519,7 +564,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               style: theme.textTheme.bodySmall?.copyWith(
                 color: _selectedImages.length < _maxImages 
                     ? theme.colorScheme.primary 
-                    : theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -560,18 +605,31 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   }
 
   Widget _buildPersonalInfoSection(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(20),
+    return AnimatedContainer(
+      duration: AppConstants.standardAnimationDuration,
+      padding: const EdgeInsets.all(20.0),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [
+            AppConstants.cardSurface,
+            AppConstants.surfaceLight.withValues(alpha: 0.9),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
         boxShadow: [
+          ...AppConstants.shadowMedium,
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppConstants.primaryPurple.withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
+        border: Border.all(
+          color: AppConstants.primaryPurple.withValues(alpha: 0.08),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -581,7 +639,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -613,7 +671,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -646,7 +704,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -682,7 +740,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -715,7 +773,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -749,7 +807,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -781,7 +839,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: theme.colorScheme.outline.withOpacity(0.3),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -809,7 +867,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -823,7 +881,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -847,14 +905,15 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
             initialValue: _selectedService,
             decoration: InputDecoration(
               labelText: 'Service Type *',
-              prefixIcon: const Icon(Icons.home_repair_service),
+              prefixIcon: const Icon(Icons.build_outlined, size: 18),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -868,7 +927,10 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
             items: _services.map((service) {
               return DropdownMenuItem(
                 value: service,
-                child: Text(service),
+                child: Text(
+                  service,
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             }).toList(),
             onChanged: (value) {
@@ -891,7 +953,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -916,7 +978,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -930,7 +992,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -962,7 +1024,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
+                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
@@ -980,44 +1042,86 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   }
 
   Widget _buildSubmitButton(ThemeData theme) {
-    return SizedBox(
+    return AnimatedContainer(
+      duration: AppConstants.standardAnimationDuration,
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isSubmitting ? null : _submitForm,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 0,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: _isSubmitting 
+              ? [Colors.grey.shade400, Colors.grey.shade500]
+              : AppConstants.primaryGradient,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_isSubmitting) ...[
-              const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
+        borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+        boxShadow: _isSubmitting
+            ? []
+            : [
+                BoxShadow(
+                  color: AppConstants.primaryPurple.withValues(alpha: 0.3),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
                 ),
-              ),
-              const SizedBox(width: 12),
-            ] else ...[
-              const Icon(Icons.send, size: 20),
-              const SizedBox(width: 8),
-            ],
-            Text(
-              _isSubmitting ? 'Submitting...' : 'Submit Consultation Request',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+                BoxShadow(
+                  color: AppConstants.primaryPurple.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _isSubmitting ? null : _submitForm,
+          borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: 20.0,
+              horizontal: 24.0,
             ),
-          ],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (_isSubmitting) ...[
+                  Container(
+                    width: 24,
+                    height: 24,
+                    padding: const EdgeInsets.all(2),
+                    child: const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  ),
+                  const SizedBox(width: 16.0),
+                ] else ...[
+                  Container(
+                    padding: const EdgeInsets.all(4.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+                    ),
+                    child: const Icon(
+                      Icons.send_rounded,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 12.0),
+                ],
+                Flexible(
+                  child: Text(
+                    _isSubmitting ? 'Sending Request...' : 'Submit Consultation Request',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -1027,10 +1131,10 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -1128,8 +1232,8 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         photoCount: _selectedImages.length,
       );
 
-      // Send email using real email service
-      final emailSent = await RealEmailService.sendBookingEmail(
+      // Open email client with booking details - user just needs to press send
+      final emailOpened = await SimpleEmailService.openEmailWithBookingDetails(
         name: _nameController.text,
         email: _emailController.text,
         phone: _phoneController.text,
@@ -1142,172 +1246,207 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         photoCount: _selectedImages.length,
       );
 
-      if (mounted && emailSent) {
-        // Show success dialog
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            icon: const Icon(
-              Icons.mail_outline,
-              color: Colors.green,
-              size: 48,
-            ),
-            title: const Text('Request Sent Successfully!'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Your consultation request has been automatically sent to our team. We have received all your details and will contact you within 24 hours.',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+      if (mounted) {
+        if (emailOpened) {
+          // Show success dialog - email client opened
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              icon: const Icon(
+                Icons.email,
+                color: Colors.green,
+                size: 48,
+              ),
+              title: const Text('Email Client Opened!'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Your email client has opened with all consultation details pre-filled. Simply review and press SEND to submit your request.',
+                    textAlign: TextAlign.center,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        color: Colors.green.shade600,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Request processed automatically',
-                        style: TextStyle(
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.send,
                           color: Colors.green.shade600,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
+                          size: 16,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.receipt,
-                        color: Colors.blue.shade600,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Order ID: ${order.id.substring(0, 8)}',
-                        style: TextStyle(
-                          color: Colors.blue.shade600,
-                          fontWeight: FontWeight.w500,
+                        const SizedBox(width: 4),
+                        Text(
+                          'Just press SEND in your email app',
+                          style: TextStyle(
+                            color: Colors.green.shade600,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                if (_selectedImages.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(
-                    '${_selectedImages.length} photo${_selectedImages.length == 1 ? '' : 's'} included in request.',
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.receipt,
+                          color: Colors.blue.shade600,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Order ID: ${order.id.substring(0, 8)}',
+                          style: TextStyle(
+                            color: Colors.blue.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_selectedImages.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      '${_selectedImages.length} photo${_selectedImages.length == 1 ? '' : 's'} mentioned in email.',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  const Text(
+                    'To: srijanmishram@gmail.com',
                     style: TextStyle(
-                      color: Colors.grey.shade600,
                       fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
                     ),
                   ),
                 ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ref.read(tabNavigationProvider.notifier).switchToOrders();
+                  },
+                  child: const Text('View Orders'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ref.read(tabNavigationProvider.notifier).switchToHome();
+                  },
+                  child: const Text('Done'),
+                ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ref.read(tabNavigationProvider.notifier).switchToOrders();
-                },
-                child: const Text('View Orders'),
+          );
+        } else {
+          // Show fallback dialog if email client couldn't open
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              icon: const Icon(
+                Icons.info_outline,
+                color: Colors.orange,
+                size: 48,
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ref.read(tabNavigationProvider.notifier).switchToHome();
-                },
-                child: const Text('Done'),
-              ),
-            ],
-          ),
-        );
-      } else if (mounted) {
-        // Show email failure dialog (though this rarely happens now)
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            icon: const Icon(
-              Icons.check_circle,
-              color: Colors.green,
-              size: 48,
-            ),
-            title: const Text('Request Recorded'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Your booking request has been recorded and will be processed manually. Our team will contact you within 24 hours.',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+              title: const Text('Request Saved'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Your booking request has been saved locally. Please contact us directly to proceed with your consultation.',
+                    textAlign: TextAlign.center,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.phone,
-                        color: Colors.green.shade600,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '+91-90572 63521',
-                        style: TextStyle(
-                          color: Colors.green.shade600,
-                          fontWeight: FontWeight.w500,
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.phone,
+                              color: Colors.blue.shade600,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '+91-90572 63521',
+                              style: TextStyle(
+                                color: Colors.blue.shade600,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.email,
+                              color: Colors.blue.shade600,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'srijanmishram@gmail.com',
+                              style: TextStyle(
+                                color: Colors.blue.shade600,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ref.read(tabNavigationProvider.notifier).switchToOrders();
+                  },
+                  child: const Text('View Orders'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ref.read(tabNavigationProvider.notifier).switchToHome();
+                  },
+                  child: const Text('Done'),
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ref.read(tabNavigationProvider.notifier).switchToOrders();
-                },
-                child: const Text('View Orders'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ref.read(tabNavigationProvider.notifier).switchToHome();
-                },
-                child: const Text('Done'),
-              ),
-            ],
-          ),
-        );
+          );
+        }
       }
 
       // Clear form

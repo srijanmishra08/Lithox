@@ -5,7 +5,6 @@ import '../providers/orders_provider.dart';
 import '../providers/tab_navigation_provider.dart';
 import '../models/order.dart';
 import '../widgets/lithox_logo.dart';
-import '../services/order_service.dart';
 import '../services/android_optimization_service.dart';
 import '../utils/app_constants.dart';
 
@@ -36,7 +35,7 @@ class OrdersScreen extends ConsumerWidget {
                     gradient: LinearGradient(
                       colors: [
                         theme.colorScheme.primary,
-                        theme.colorScheme.primary.withOpacity(0.8),
+                        theme.colorScheme.primary.withValues(alpha: 0.8),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -53,7 +52,7 @@ class OrdersScreen extends ConsumerWidget {
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black.withValues(alpha: 0.1),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
@@ -78,7 +77,7 @@ class OrdersScreen extends ConsumerWidget {
                               Text(
                                 'Track Your Progress',
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                 ),
                               ),
                             ],
@@ -138,15 +137,15 @@ class OrdersScreen extends ConsumerWidget {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
         children: [
           Icon(
             Icons.receipt_long_outlined,
-            size: 64,
-            color: theme.colorScheme.primary.withOpacity(0.5),
+            size: 48,
+            color: theme.colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 24),
           Text(
@@ -177,22 +176,6 @@ class OrdersScreen extends ConsumerWidget {
             icon: const Icon(Icons.calendar_today),
             label: const Text('Book Consultation'),
           ),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: () async {
-              // Force generate mock orders for testing
-              await OrderService.generateMockOrders();
-              await ref.read(ordersProvider.notifier).refreshOrders();
-            },
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            icon: const Icon(Icons.refresh),
-            label: const Text('Load Sample Orders'),
-          ),
         ],
       ),
     );
@@ -206,7 +189,7 @@ class OrdersScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -260,10 +243,10 @@ class OrdersScreen extends ConsumerWidget {
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -313,11 +296,11 @@ class OrdersScreen extends ConsumerWidget {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -355,7 +338,7 @@ class OrdersScreen extends ConsumerWidget {
           Row(
             children: [
               Icon(
-                Icons.home_repair_service,
+                Icons.work_outline,
                 size: 16,
                 color: theme.colorScheme.primary,
               ),
@@ -374,7 +357,7 @@ class OrdersScreen extends ConsumerWidget {
           Row(
             children: [
               Icon(
-                Icons.schedule,
+                Icons.calendar_today,
                 size: 16,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -493,9 +476,9 @@ class OrdersScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -35,7 +35,7 @@ class RealEmailService {
       );
 
       if (emailClientSuccess) {
-        print('✅ Email sent via device email client');
+        // DEBUG: print statement commented out for production
         return true;
       }
 
@@ -54,7 +54,7 @@ class RealEmailService {
       );
 
       if (httpSuccess) {
-        print('✅ Email sent via HTTP service');
+        // DEBUG: print statement commented out for production
         return true;
       }
 
@@ -74,8 +74,7 @@ class RealEmailService {
 
       return true; // Always return true to show success to user
     } catch (e) {
-      print('Email service error: $e');
-      
+      // DEBUG: print statement commented out for production
       // Log for manual processing even on error
       await _logBookingForManualProcessing(
         name: name,
@@ -160,7 +159,7 @@ ${notes.isNotEmpty ? notes : 'None provided'}
       
       return false;
     } catch (e) {
-      print('Email client error: $e');
+      // DEBUG: print statement commented out for production
       return false;
     }
   }
@@ -214,7 +213,7 @@ ${notes.isNotEmpty ? notes : 'None provided'}
 
       return response.statusCode == 200;
     } catch (e) {
-      print('HTTP email error: $e');
+      // DEBUG: print statement commented out for production
       return false;
     }
   }
@@ -317,7 +316,7 @@ ${notes.isNotEmpty ? notes : 'None provided'}
     final orderId = 'LTX-${DateTime.now().millisecondsSinceEpoch}';
     final timestamp = DateTime.now().toString();
     
-    final logData = '''
+    final _ = '''
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║                          🔥 URGENT: NEW BOOKING REQUEST                     ║
 ║                              Lithox Epoxy                                   ║
@@ -348,8 +347,7 @@ ${notes.isNotEmpty ? notes : 'None provided'}
 ════════════════════════════════════════════════════════════════════════════════
     ''';
 
-    print(logData);
-    
+    // DEBUG: print statement commented out for production
     // In production, you would:
     // 1. Store this in a queue for manual processing
     // 2. Send to a backup notification system
