@@ -75,10 +75,18 @@ The production-ready APK is located at: `lithox-app.apk`
 - ✅ Production-ready
 
 ## 🎯 Installation Instructions
-1. Download `lithox-app.apk` from the project root
+1. Download `lithox-app.apk` from:
+   - **Local Development:** Project root directory
+   - **GitHub:** Check releases section (APK too large for main repo)
+   - **Direct Download:** Contact developer for latest APK
 2. Enable "Install from Unknown Sources" on your Android device
 3. Install the APK
 4. Launch the Lithox Epoxy app
+
+## 📥 APK Download Sources
+- **GitHub Repository:** https://github.com/srijanmishra08/Lithox
+- **Latest Release:** Check releases tab for downloadable APK
+- **File Size:** 51.5MB (excluded from main repo due to size)
 
 ## 📱 Tested Platforms
 - ✅ Android (APK)
