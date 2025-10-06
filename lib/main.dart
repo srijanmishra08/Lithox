@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,25 +38,21 @@ void main() async {
 /// Initialize database factory for SQLite support
 Future<void> _initializeDatabase() async {
   try {
-    // Only initialize FFI for non-web platforms
-    if (!kIsWeb) {
-      // Initialize sqflite_common_ffi for desktop platforms
+    // Only initialize FFI for desktop platforms (not mobile)
+    if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+      // Initialize sqflite_common_ffi for desktop platforms only
       sqfliteFfiInit();
       
-      // Set the database factory - this is required when using sqflite_common_ffi
-      // This ensures the databaseFactory is properly initialized
+      // Set the database factory for desktop platforms
       databaseFactory = databaseFactoryFfi;
     }
-    // For web, use the default database factory (or skip database initialization)
-    // Database factory is now initialized
+    // For Android/iOS, use the default sqflite database factory
+    // For web, use web storage
     
   } catch (e) {
     // If FFI initialization fails, ensure we have a fallback
     // This should not happen but provides a safety net
-    // Database initialization warning: silently handled
-    
-    // For web and fallback cases, we'll use in-memory storage or skip database
-    // rethrow;
+    debugPrint('Database initialization warning: $e');
   }
 }
 

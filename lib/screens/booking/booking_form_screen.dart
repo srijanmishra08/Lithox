@@ -1171,7 +1171,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Email: srijanmishram@gmail.com',
+                'Email: lithochem.tech@gmail.com',
                 style: theme.textTheme.bodyMedium,
               ),
             ],
@@ -1331,7 +1331,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                   ],
                   const SizedBox(height: 12),
                   const Text(
-                    'To: srijanmishram@gmail.com',
+                    'To: lithochem.tech@gmail.com',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -1414,7 +1414,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              'srijanmishram@gmail.com',
+                              'lithochem.tech@gmail.com',
                               style: TextStyle(
                                 color: Colors.blue.shade600,
                                 fontWeight: FontWeight.w500,

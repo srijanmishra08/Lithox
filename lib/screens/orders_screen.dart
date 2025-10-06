@@ -15,7 +15,6 @@ class OrdersScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final orders = ref.watch(ordersProvider);
-    final stats = ref.watch(orderStatsProvider);
 
     return Scaffold(
       body: CustomScrollView(
@@ -99,27 +98,8 @@ class OrdersScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  // Debug info
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Orders count: ${orders.length}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ),
-                  if (orders.isEmpty) _buildEmptyState(theme, ref) else ...[
-                    _buildStatsCards(stats, theme),
-                    const SizedBox(height: 24),
+                  if (orders.isEmpty) _buildEmptyState(theme, ref) else 
                     _buildOrdersList(orders, theme),
-                  ],
                 ],
               ),
             ),
@@ -181,103 +161,7 @@ class OrdersScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsCards(OrderStats stats, ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Order Statistics',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Always use 2x2 grid for mobile-first design
-          Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactStatItem('Total', stats.total, Colors.blue, theme),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: _buildCompactStatItem('Pending', stats.pending, Colors.orange, theme),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildCompactStatItem('Progress', stats.inProgress, Colors.purple, theme),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: _buildCompactStatItem('Complete', stats.completed, Colors.green, theme),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildCompactStatItem(String label, int value, Color color, ThemeData theme) {
-    return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            value.toString(),
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
-          const SizedBox(height: 1),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.w600,
-              fontSize: 9,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildOrdersList(List<Order> orders, ThemeData theme) {
     return ListView.separated(
@@ -331,7 +215,6 @@ class OrdersScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              _buildStatusChip(order.status, theme),
             ],
           ),
           const SizedBox(height: 16),
@@ -370,26 +253,6 @@ class OrdersScreen extends ConsumerWidget {
               ),
             ],
           ),
-          if (order.estimatedCost != null) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(
-                  Icons.currency_rupee,
-                  size: 16,
-                  color: Colors.green.shade600,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Estimated: ₹${order.estimatedCost}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.green.shade600,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ],
           if (order.updates.isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(
@@ -437,65 +300,6 @@ class OrdersScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatusChip(OrderStatus status, ThemeData theme) {
-    Color color;
-    IconData icon;
-    String text = status.toString().split('.').last;
-
-    switch (status) {
-      case OrderStatus.submitted:
-        color = Colors.orange;
-        icon = Icons.hourglass_empty;
-        break;
-      case OrderStatus.reviewed:
-        color = Colors.blue;
-        icon = Icons.rate_review;
-        break;
-      case OrderStatus.quoted:
-        color = Colors.blue;
-        icon = Icons.request_quote;
-        break;
-      case OrderStatus.scheduled:
-        color = Colors.purple;
-        icon = Icons.schedule;
-        break;
-      case OrderStatus.inProgress:
-        color = Colors.purple;
-        icon = Icons.construction;
-        break;
-      case OrderStatus.completed:
-        color = Colors.green;
-        icon = Icons.check_circle;
-        break;
-      case OrderStatus.cancelled:
-        color = Colors.red;
-        icon = Icons.cancel;
-        break;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
-          Text(
-            text.replaceAll(RegExp(r'([A-Z])'), ' \$1').trim(),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
@@ -522,11 +326,6 @@ class OrdersScreen extends ConsumerWidget {
                 if (order.approximateArea.isNotEmpty) 
                   _buildDetailRow('Area Size', order.approximateArea),
                 _buildDetailRow('Created', _formatDate(order.createdAt)),
-                _buildDetailRow('Status', order.status.displayName),
-                if (order.estimatedCost != null)
-                  _buildDetailRow('Estimated Cost', '₹${order.estimatedCost}'),
-                if (order.finalCost != null)
-                  _buildDetailRow('Final Cost', '₹${order.finalCost}'),
                 if (order.scheduledDate != null)
                   _buildDetailRow('Scheduled Date', _formatDate(order.scheduledDate!)),
                 if (order.completedDate != null)
@@ -615,15 +414,14 @@ class OrdersScreen extends ConsumerWidget {
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Close'),
           ),
-          if (order.status != OrderStatus.completed && order.status != OrderStatus.cancelled)
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _contactSupport(context, order);
-              },
-              icon: const Icon(Icons.support_agent),
-              label: const Text('Contact Support'),
-            ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _contactSupport(context, order);
+            },
+            icon: const Icon(Icons.support_agent),
+            label: const Text('Contact Support'),
+          ),
         ],
       ),
     );
@@ -731,7 +529,7 @@ class OrdersScreen extends ConsumerWidget {
                                     'Email Us',
                                     style: TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  const Text('faizan.mdprince@gmail.com'),
+                                  const Text('lithochem.tech@gmail.com'),
                                   Text(
                                     'We\'ll respond within 2 hours',
                                     style: TextStyle(
@@ -811,7 +609,7 @@ class OrdersScreen extends ConsumerWidget {
 
   Future<void> _launchEmail(BuildContext context, String orderId) async {
     try {
-      final emailUrl = Uri.parse('mailto:faizan.mdprince@gmail.com?subject=Order Help - $orderId');
+      final emailUrl = Uri.parse('mailto:lithochem.tech@gmail.com?subject=Order Help - $orderId');
       
       if (await canLaunchUrl(emailUrl)) {
         await launchUrl(emailUrl);
@@ -840,7 +638,7 @@ class OrdersScreen extends ConsumerWidget {
             const Text('Please send an email to:'),
             const SizedBox(height: 8),
             SelectableText(
-              'faizan.mdprince@gmail.com',
+              'lithochem.tech@gmail.com',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
@@ -874,7 +672,7 @@ class OrdersScreen extends ConsumerWidget {
               // Try to open Gmail web interface
               await AndroidOptimizationService.launchWebUrl(
                 context,
-                'https://mail.google.com/mail/?view=cm&fs=1&to=faizan.mdprince@gmail.com&su=Order Help - $orderId',
+                'https://mail.google.com/mail/?view=cm&fs=1&to=lithochem.tech@gmail.com&su=Order Help - $orderId',
               );
             },
             child: const Text('Open Gmail'),

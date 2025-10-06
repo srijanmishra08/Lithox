@@ -34,72 +34,76 @@ class MainTabScaffold extends ConsumerWidget {
   }
 
   Widget _buildBottomNav(ThemeData theme, int currentIndex, WidgetRef ref) {
-    return IntrinsicHeight(
-      child: Container(
-        constraints: const BoxConstraints(
-          minHeight: 60,
-          maxHeight: 80,
-        ),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              AppConstants.cardSurface,
-              AppConstants.surfaceLight,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppConstants.shadowColor.withValues(alpha: 0.08),
-              blurRadius: 32,
-              offset: const Offset(0, -8),
-            ),
-            BoxShadow(
-              color: AppConstants.primaryPurple.withValues(alpha: 0.05),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
+    return Container(
+      constraints: const BoxConstraints(
+        minHeight: 70,
+      ),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            AppConstants.cardSurface,
+            AppConstants.surfaceLight,
           ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-        child: SafeArea(
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
-            ),
-            child: Row(
+        boxShadow: [
+          BoxShadow(
+            color: AppConstants.shadowColor.withValues(alpha: 0.08),
+            blurRadius: 32,
+            offset: const Offset(0, -8),
+          ),
+          BoxShadow(
+            color: AppConstants.primaryPurple.withValues(alpha: 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20.0,
+            vertical: 10.0,
+          ),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisSize: MainAxisSize.max,
             children: [
-              _buildNavItem(
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home,
-                label: 'Home',
-                index: 0,
-                currentIndex: currentIndex,
-                theme: theme,
-                onTap: () => ref.read(tabNavigationProvider.notifier).switchToTab(0),
+              Expanded(
+                child: _buildNavItem(
+                  icon: Icons.home_outlined,
+                  activeIcon: Icons.home,
+                  label: 'Home',
+                  index: 0,
+                  currentIndex: currentIndex,
+                  theme: theme,
+                  onTap: () => ref.read(tabNavigationProvider.notifier).switchToTab(0),
+                ),
               ),
-              _buildNavItem(
-                icon: Icons.calendar_today_outlined,
-                activeIcon: Icons.calendar_today,
-                label: 'Book',
-                index: 1,
-                currentIndex: currentIndex,
-                theme: theme,
-                onTap: () => ref.read(tabNavigationProvider.notifier).switchToTab(1),
+              Expanded(
+                child: _buildNavItem(
+                  icon: Icons.calendar_today_outlined,
+                  activeIcon: Icons.calendar_today,
+                  label: 'Book',
+                  index: 1,
+                  currentIndex: currentIndex,
+                  theme: theme,
+                  onTap: () => ref.read(tabNavigationProvider.notifier).switchToTab(1),
+                ),
               ),
-              _buildNavItem(
-                icon: Icons.receipt_long_outlined,
-                activeIcon: Icons.receipt_long,
-                label: 'Orders',
-                index: 2,
-                currentIndex: currentIndex,
-                theme: theme,
-                onTap: () => ref.read(tabNavigationProvider.notifier).switchToTab(2),
+              Expanded(
+                child: _buildNavItem(
+                  icon: Icons.receipt_long_outlined,
+                  activeIcon: Icons.receipt_long,
+                  label: 'Orders',
+                  index: 2,
+                  currentIndex: currentIndex,
+                  theme: theme,
+                  onTap: () => ref.read(tabNavigationProvider.notifier).switchToTab(2),
+                ),
               ),
             ],
-          ),
           ),
         ),
       ),
@@ -156,6 +160,7 @@ class MainTabScaffold extends ConsumerWidget {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
@@ -176,8 +181,14 @@ class MainTabScaffold extends ConsumerWidget {
                   ? theme.colorScheme.primary 
                   : theme.colorScheme.onSurfaceVariant,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 11,
               ),
-              child: Text(label),
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

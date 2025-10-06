@@ -13,9 +13,6 @@ class Order {
   final DateTime createdAt;
   final DateTime? scheduledDate;
   final DateTime? completedDate;
-  final OrderStatus status;
-  final double? estimatedCost;
-  final double? finalCost;
   final List<OrderUpdate> updates;
 
   const Order({
@@ -33,9 +30,6 @@ class Order {
     required this.createdAt,
     this.scheduledDate,
     this.completedDate,
-    required this.status,
-    this.estimatedCost,
-    this.finalCost,
     this.updates = const [],
   });
 
@@ -54,9 +48,6 @@ class Order {
     DateTime? createdAt,
     DateTime? scheduledDate,
     DateTime? completedDate,
-    OrderStatus? status,
-    double? estimatedCost,
-    double? finalCost,
     List<OrderUpdate>? updates,
   }) {
     return Order(
@@ -74,9 +65,6 @@ class Order {
       createdAt: createdAt ?? this.createdAt,
       scheduledDate: scheduledDate ?? this.scheduledDate,
       completedDate: completedDate ?? this.completedDate,
-      status: status ?? this.status,
-      estimatedCost: estimatedCost ?? this.estimatedCost,
-      finalCost: finalCost ?? this.finalCost,
       updates: updates ?? this.updates,
     );
   }
@@ -97,9 +85,6 @@ class Order {
       'createdAt': createdAt.toIso8601String(),
       'scheduledDate': scheduledDate?.toIso8601String(),
       'completedDate': completedDate?.toIso8601String(),
-      'status': status.name,
-      'estimatedCost': estimatedCost,
-      'finalCost': finalCost,
       'updates': updates.map((update) => update.toJson()).toList(),
     };
   }
@@ -120,73 +105,21 @@ class Order {
       createdAt: DateTime.parse(json['createdAt']),
       scheduledDate: json['scheduledDate'] != null ? DateTime.parse(json['scheduledDate']) : null,
       completedDate: json['completedDate'] != null ? DateTime.parse(json['completedDate']) : null,
-      status: OrderStatus.values.firstWhere((e) => e.name == json['status']),
-      estimatedCost: json['estimatedCost']?.toDouble(),
-      finalCost: json['finalCost']?.toDouble(),
       updates: (json['updates'] as List?)?.map((update) => OrderUpdate.fromJson(update)).toList() ?? [],
     );
   }
 }
 
-enum OrderStatus {
-  submitted,
-  reviewed,
-  quoted,
-  scheduled,
-  inProgress,
-  completed,
-  cancelled;
-
-  String get displayName {
-    switch (this) {
-      case OrderStatus.submitted:
-        return 'Submitted';
-      case OrderStatus.reviewed:
-        return 'Under Review';
-      case OrderStatus.quoted:
-        return 'Quote Provided';
-      case OrderStatus.scheduled:
-        return 'Scheduled';
-      case OrderStatus.inProgress:
-        return 'In Progress';
-      case OrderStatus.completed:
-        return 'Completed';
-      case OrderStatus.cancelled:
-        return 'Cancelled';
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case OrderStatus.submitted:
-        return 'Your consultation request has been received';
-      case OrderStatus.reviewed:
-        return 'Our team is reviewing your requirements';
-      case OrderStatus.quoted:
-        return 'Quote has been prepared for your approval';
-      case OrderStatus.scheduled:
-        return 'Installation has been scheduled';
-      case OrderStatus.inProgress:
-        return 'Work is currently in progress';
-      case OrderStatus.completed:
-        return 'Project has been completed successfully';
-      case OrderStatus.cancelled:
-        return 'Order has been cancelled';
-    }
-  }
-}
 
 class OrderUpdate {
   final String id;
   final DateTime timestamp;
-  final OrderStatus status;
   final String message;
   final String? notes;
 
   const OrderUpdate({
     required this.id,
     required this.timestamp,
-    required this.status,
     required this.message,
     this.notes,
   });
@@ -195,7 +128,6 @@ class OrderUpdate {
     return {
       'id': id,
       'timestamp': timestamp.toIso8601String(),
-      'status': status.name,
       'message': message,
       'notes': notes,
     };
@@ -205,7 +137,6 @@ class OrderUpdate {
     return OrderUpdate(
       id: json['id'],
       timestamp: DateTime.parse(json['timestamp']),
-      status: OrderStatus.values.firstWhere((e) => e.name == json['status']),
       message: json['message'],
       notes: json['notes'],
     );

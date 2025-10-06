@@ -445,6 +445,7 @@ class AboutUsScreen extends StatelessWidget {
                 ],
               ),
             ),
+            
                 ],
               ),
             ),

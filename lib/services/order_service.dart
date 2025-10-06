@@ -32,12 +32,10 @@ class OrderService {
       notes: notes,
       photoCount: photoCount,
       createdAt: DateTime.now(),
-      status: OrderStatus.submitted,
       updates: [
         OrderUpdate(
           id: _generateUpdateId(),
           timestamp: DateTime.now(),
-          status: OrderStatus.submitted,
           message: 'Consultation request submitted successfully',
           notes: 'Your request has been received and will be reviewed within 24 hours.',
         ),
@@ -63,46 +61,20 @@ class OrderService {
     return await DatabaseService.getOrderById(orderId);
   }
 
-  // Update order status
-  static Future<bool> updateOrderStatus(String orderId, OrderStatus newStatus, {String? notes}) async {
+
+  // Add order note (replaces cost estimate functionality)
+  static Future<bool> addOrderNote(String orderId, String note) async {
     final order = await DatabaseService.getOrderById(orderId);
     if (order == null) return false;
 
     final update = OrderUpdate(
       id: _generateUpdateId(),
       timestamp: DateTime.now(),
-      status: newStatus,
-      message: newStatus.description,
-      notes: notes,
+      message: 'Order note added',
+      notes: note,
     );
 
     final updatedOrder = order.copyWith(
-      status: newStatus,
-      updates: [...order.updates, update],
-      scheduledDate: newStatus == OrderStatus.scheduled ? DateTime.now().add(const Duration(days: 3)) : order.scheduledDate,
-      completedDate: newStatus == OrderStatus.completed ? DateTime.now() : order.completedDate,
-    );
-
-    await DatabaseService.updateOrder(updatedOrder);
-    return true;
-  }
-
-  // Add cost estimate to order
-  static Future<bool> addCostEstimate(String orderId, double estimatedCost) async {
-    final order = await DatabaseService.getOrderById(orderId);
-    if (order == null) return false;
-
-    final update = OrderUpdate(
-      id: _generateUpdateId(),
-      timestamp: DateTime.now(),
-      status: OrderStatus.quoted,
-      message: 'Cost estimate prepared',
-      notes: 'Estimated cost: ₹${estimatedCost.toStringAsFixed(0)}',
-    );
-
-    final updatedOrder = order.copyWith(
-      status: OrderStatus.quoted,
-      estimatedCost: estimatedCost,
       updates: [...order.updates, update],
     );
 
@@ -130,32 +102,15 @@ class OrderService {
         photoCount: 3,
         createdAt: DateTime.now().subtract(const Duration(days: 5)),
         scheduledDate: DateTime.now().add(const Duration(days: 2)),
-        status: OrderStatus.scheduled,
-        estimatedCost: 45000,
         updates: [
           OrderUpdate(
             id: 'UPD-001',
             timestamp: DateTime.now().subtract(const Duration(days: 5)),
-            status: OrderStatus.submitted,
-            message: 'Consultation request submitted successfully',
+            message: 'Consultation request received',
           ),
           OrderUpdate(
             id: 'UPD-002',
-            timestamp: DateTime.now().subtract(const Duration(days: 4)),
-            status: OrderStatus.reviewed,
-            message: 'Our team is reviewing your requirements',
-          ),
-          OrderUpdate(
-            id: 'UPD-003',
-            timestamp: DateTime.now().subtract(const Duration(days: 2)),
-            status: OrderStatus.quoted,
-            message: 'Cost estimate prepared',
-            notes: 'Estimated cost: ₹45,000',
-          ),
-          OrderUpdate(
-            id: 'UPD-004',
             timestamp: DateTime.now().subtract(const Duration(days: 1)),
-            status: OrderStatus.scheduled,
             message: 'Installation has been scheduled',
             notes: 'Scheduled for ${DateTime.now().add(const Duration(days: 2)).toString().split(' ')[0]}',
           ),
@@ -174,48 +129,16 @@ class OrderService {
         notes: 'Office space renovation',
         photoCount: 5,
         createdAt: DateTime.now().subtract(const Duration(days: 10)),
-        completedDate: DateTime.now().subtract(const Duration(days: 1)),
-        status: OrderStatus.completed,
-        estimatedCost: 85000,
-        finalCost: 82000,
         updates: [
           OrderUpdate(
             id: 'UPD-005',
             timestamp: DateTime.now().subtract(const Duration(days: 10)),
-            status: OrderStatus.submitted,
-            message: 'Consultation request submitted successfully',
+            message: 'Consultation request received',
           ),
           OrderUpdate(
             id: 'UPD-006',
-            timestamp: DateTime.now().subtract(const Duration(days: 9)),
-            status: OrderStatus.reviewed,
-            message: 'Our team is reviewing your requirements',
-          ),
-          OrderUpdate(
-            id: 'UPD-007',
-            timestamp: DateTime.now().subtract(const Duration(days: 7)),
-            status: OrderStatus.quoted,
-            message: 'Cost estimate prepared',
-            notes: 'Estimated cost: ₹85,000',
-          ),
-          OrderUpdate(
-            id: 'UPD-008',
-            timestamp: DateTime.now().subtract(const Duration(days: 5)),
-            status: OrderStatus.scheduled,
-            message: 'Installation has been scheduled',
-          ),
-          OrderUpdate(
-            id: 'UPD-009',
             timestamp: DateTime.now().subtract(const Duration(days: 3)),
-            status: OrderStatus.inProgress,
             message: 'Work is currently in progress',
-          ),
-          OrderUpdate(
-            id: 'UPD-010',
-            timestamp: DateTime.now().subtract(const Duration(days: 1)),
-            status: OrderStatus.completed,
-            message: 'Project has been completed successfully',
-            notes: 'Final cost: ₹82,000',
           ),
         ],
       ),
@@ -229,16 +152,9 @@ class OrderService {
 
   // Simulate order progress for demo purposes
   static void _simulateOrderProgress(String orderId) {
-    // Simulate review after 10 seconds
+    // Simulate status update after 10 seconds
     Future.delayed(const Duration(seconds: 10), () async {
-      await updateOrderStatus(orderId, OrderStatus.reviewed, 
-        notes: 'Our expert team has reviewed your requirements.');
-    });
-
-    // Simulate quote after 30 seconds
-    Future.delayed(const Duration(seconds: 30), () async {
-      final cost = _random.nextDouble() * 50000 + 20000; // Random cost between 20k-70k
-      await addCostEstimate(orderId, cost);
+      await addOrderNote(orderId, 'Our expert team has reviewed your requirements and will contact you soon.');
     });
   }
 

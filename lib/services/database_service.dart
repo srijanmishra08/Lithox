@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
@@ -28,15 +29,18 @@ class DatabaseService {
       throw UnsupportedError('Database not supported on web platform');
     }
     
-    // Ensure database factory is initialized for non-web platforms
-    try {
-      // Initialize sqflite_common_ffi if not already done
-      sqfliteFfiInit();
-      databaseFactory = databaseFactoryFfi;
-    } catch (e) {
-      // Database factory should already be initialized in main.dart
-      // This is a fallback in case it wasn't
+    // For desktop platforms, use FFI. For mobile (Android/iOS), use regular sqflite
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      // Desktop platforms: ensure FFI is initialized
+      try {
+        sqfliteFfiInit();
+        databaseFactory = databaseFactoryFfi;
+      } catch (e) {
+        // Database factory should already be initialized in main.dart
+        debugPrint('Desktop database initialization fallback: $e');
+      }
     }
+    // For Android/iOS, use the default sqflite database factory (no FFI needed)
     
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, _databaseName);
@@ -66,10 +70,7 @@ class DatabaseService {
         photoCount INTEGER NOT NULL,
         createdAt TEXT NOT NULL,
         scheduledDate TEXT,
-        completedDate TEXT,
-        status TEXT NOT NULL,
-        estimatedCost REAL,
-        finalCost REAL
+        completedDate TEXT
       )
     ''');
 
@@ -79,7 +80,6 @@ class DatabaseService {
         id TEXT PRIMARY KEY,
         orderId TEXT NOT NULL,
         timestamp TEXT NOT NULL,
-        status TEXT NOT NULL,
         message TEXT NOT NULL,
         notes TEXT,
         FOREIGN KEY (orderId) REFERENCES $_ordersTable (id)
@@ -118,9 +118,6 @@ class DatabaseService {
         'createdAt': order.createdAt.toIso8601String(),
         'scheduledDate': order.scheduledDate?.toIso8601String(),
         'completedDate': order.completedDate?.toIso8601String(),
-        'status': order.status.name,
-        'estimatedCost': order.estimatedCost,
-        'finalCost': order.finalCost,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -133,7 +130,6 @@ class DatabaseService {
           'id': update.id,
           'orderId': order.id,
           'timestamp': update.timestamp.toIso8601String(),
-          'status': update.status.name,
           'message': update.message,
           'notes': update.notes,
         },
@@ -168,7 +164,6 @@ class DatabaseService {
       final updates = updateMaps.map((updateMap) => OrderUpdate(
         id: updateMap['id'] as String,
         timestamp: DateTime.parse(updateMap['timestamp'] as String),
-        status: OrderStatus.values.firstWhere((e) => e.name == updateMap['status']),
         message: updateMap['message'] as String,
         notes: updateMap['notes'] as String?,
       )).toList();
@@ -192,11 +187,6 @@ class DatabaseService {
         completedDate: orderMap['completedDate'] != null 
             ? DateTime.parse(orderMap['completedDate'] as String) 
             : null,
-        status: OrderStatus.values.firstWhere(
-          (e) => e.name == orderMap['status'],
-        ),
-        estimatedCost: orderMap['estimatedCost'] as double?,
-        finalCost: orderMap['finalCost'] as double?,
         updates: updates,
       );
 
@@ -235,7 +225,6 @@ class DatabaseService {
     final updates = updateMaps.map((updateMap) => OrderUpdate(
       id: updateMap['id'] as String,
       timestamp: DateTime.parse(updateMap['timestamp'] as String),
-      status: OrderStatus.values.firstWhere((e) => e.name == updateMap['status']),
       message: updateMap['message'] as String,
       notes: updateMap['notes'] as String?,
     )).toList();
@@ -259,11 +248,6 @@ class DatabaseService {
       completedDate: orderMap['completedDate'] != null 
           ? DateTime.parse(orderMap['completedDate'] as String) 
           : null,
-      status: OrderStatus.values.firstWhere(
-        (e) => e.name == orderMap['status'],
-      ),
-      estimatedCost: orderMap['estimatedCost'] as double?,
-      finalCost: orderMap['finalCost'] as double?,
       updates: updates,
     );
   }
@@ -292,9 +276,6 @@ class DatabaseService {
         'photoCount': order.photoCount,
         'scheduledDate': order.scheduledDate?.toIso8601String(),
         'completedDate': order.completedDate?.toIso8601String(),
-        'status': order.status.name,
-        'estimatedCost': order.estimatedCost,
-        'finalCost': order.finalCost,
       },
       where: 'id = ?',
       whereArgs: [order.id],
@@ -315,7 +296,6 @@ class DatabaseService {
           'id': update.id,
           'orderId': order.id,
           'timestamp': update.timestamp.toIso8601String(),
-          'status': update.status.name,
           'message': update.message,
           'notes': update.notes,
         },

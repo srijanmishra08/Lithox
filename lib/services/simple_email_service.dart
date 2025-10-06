@@ -73,22 +73,47 @@ Lithox Epoxy Automated Booking System
       // DEBUG: print statement commented out for production
       // DEBUG: print statement commented out for production
       // DEBUG: print statement commented out for production
-      // Try to launch the email client
-      if (await canLaunchUrl(emailUri)) {
-        final launched = await launchUrl(
-          emailUri,
-          mode: LaunchMode.externalApplication,
-        );
-        
-        if (launched) {
-          // DEBUG: print statement commented out for production
-          return true;
-        } else {
-          // DEBUG: print statement commented out for production
-          return false;
+      // Try to launch the email client with multiple fallbacks
+      try {
+        // Method 1: Try external application mode first (preferred for Android)
+        if (await canLaunchUrl(emailUri)) {
+          final launched = await launchUrl(
+            emailUri,
+            mode: LaunchMode.externalApplication,
+          );
+          
+          if (launched) {
+            return true;
+          }
         }
-      } else {
-        // DEBUG: print statement commented out for production
+        
+        // Method 2: Try platform default mode as fallback
+        if (await canLaunchUrl(emailUri)) {
+          final launched = await launchUrl(
+            emailUri,
+            mode: LaunchMode.platformDefault,
+          );
+          
+          if (launched) {
+            return true;
+          }
+        }
+        
+        // Method 3: Try in-app web view as last resort (will at least show something)
+        if (await canLaunchUrl(emailUri)) {
+          final launched = await launchUrl(
+            emailUri,
+            mode: LaunchMode.inAppWebView,
+          );
+          
+          if (launched) {
+            return true;
+          }
+        }
+        
+        return false;
+      } catch (e) {
+        // If all methods fail, return false to show fallback dialog
         return false;
       }
     } catch (e) {

@@ -17,28 +17,7 @@ final orderByIdProvider = Provider.family<Order?, String>((ref, orderId) {
   }
 });
 
-// Provider for orders filtered by status
-final ordersByStatusProvider = Provider.family<List<Order>, OrderStatus>((ref, status) {
-  final orders = ref.watch(ordersProvider);
-  return orders.where((order) => order.status == status).toList();
-});
 
-// Provider for order statistics
-final orderStatsProvider = Provider<OrderStats>((ref) {
-  final orders = ref.watch(ordersProvider);
-  
-  int total = orders.length;
-  int completed = orders.where((o) => o.status == OrderStatus.completed).length;
-  int inProgress = orders.where((o) => o.status == OrderStatus.inProgress || o.status == OrderStatus.scheduled).length;
-  int pending = orders.where((o) => o.status == OrderStatus.submitted || o.status == OrderStatus.reviewed || o.status == OrderStatus.quoted).length;
-  
-  return OrderStats(
-    total: total,
-    completed: completed,
-    inProgress: inProgress,
-    pending: pending,
-  );
-});
 
 class OrdersNotifier extends StateNotifier<List<Order>> {
   OrdersNotifier() : super([]) {
@@ -93,13 +72,6 @@ class OrdersNotifier extends StateNotifier<List<Order>> {
     return order;
   }
 
-  // Update order status
-  void updateOrderStatus(String orderId, OrderStatus newStatus, {String? notes}) async {
-    final success = await OrderService.updateOrderStatus(orderId, newStatus, notes: notes);
-    if (success) {
-      await refreshOrders();
-    }
-  }
 
   // Refresh orders from service
   Future<void> refreshOrders() async {
@@ -123,16 +95,3 @@ class OrdersNotifier extends StateNotifier<List<Order>> {
   }
 }
 
-class OrderStats {
-  final int total;
-  final int completed;
-  final int inProgress;
-  final int pending;
-
-  const OrderStats({
-    required this.total,
-    required this.completed,
-    required this.inProgress,
-    required this.pending,
-  });
-}
