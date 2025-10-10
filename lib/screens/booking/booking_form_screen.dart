@@ -29,18 +29,19 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   final _notesController = TextEditingController();
   final _otherRequirementController = TextEditingController();
   
-  String _selectedService = 'Residential Flooring - 40 RS SQ. FT';
+  String _selectedService = 'Residential - 40 RS SQ. FT';
   final List<XFile> _selectedImages = [];
   bool _isSubmitting = false;
   final int _maxImages = AppConstants.maxImagesPerForm;
 
   final List<String> _services = [
-    'Residential Flooring - 40 RS SQ. FT',
-    'Commercial Flooring - 30 RS SQ. FT',
-    'Industrial Flooring - 150 RS SQ. FT',
-    'Garage Flooring - 50 RS SQ. FT',
-    'Basement Flooring - 100 RS SQ FT / 150 RS SQ. FT (Two Different Quality)',
-    'Swimming Pool/Terrace Epoxy Tile Flooring - 300 RS SQ FT',
+    'Residential - 40 RS SQ. FT',
+    'Commercial - 30 RS SQ. FT',
+    'Industrial - 150 RS SQ. FT',
+    'Garage - 50 RS SQ. FT',
+    'Basement - 100 RS SQ FT / 150 RS SQ. FT',
+    'Swimming Pool - 300 RS SQ FT',
+    'Terrace Epoxy Tile - 300 RS SQ FT',
     'Other',
   ];
 
@@ -925,18 +926,16 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                 ),
               ),
             ),
+            isExpanded: true, // This prevents overflow
             items: _services.map((service) {
               return DropdownMenuItem(
                 value: service,
-                child: SizedBox(
-                  width: 280, // Fixed width to prevent overflow
-                  child: Text(
-                    service,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontSize: service.length > 40 ? 10 : 12,
-                    ),
+                child: Text(
+                  service,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontSize: 12, // Consistent font size for all
                   ),
                 ),
               );
@@ -1561,7 +1560,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     _notesController.clear();
     _otherRequirementController.clear();
     setState(() {
-      _selectedService = 'Residential Flooring - 40 RS SQ. FT';
+      _selectedService = 'Residential - 40 RS SQ. FT';
       _selectedImages.clear();
     });
   }
