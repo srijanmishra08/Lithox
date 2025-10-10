@@ -27,20 +27,20 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   final _areaController = TextEditingController();
   final _approximateAreaController = TextEditingController();
   final _notesController = TextEditingController();
+  final _otherRequirementController = TextEditingController();
   
-  String _selectedService = 'Residential Flooring';
+  String _selectedService = 'Residential Flooring - 40 RS SQ. FT';
   final List<XFile> _selectedImages = [];
   bool _isSubmitting = false;
   final int _maxImages = AppConstants.maxImagesPerForm;
 
   final List<String> _services = [
-    'Residential Flooring',
-    'Commercial Flooring',
-    'Industrial Flooring',
-    'Garage Flooring',
-    'Basement Flooring',
-    'Kitchen Flooring',
-    'Bathroom Flooring',
+    'Residential Flooring - 40 RS SQ. FT',
+    'Commercial Flooring - 30 RS SQ. FT',
+    'Industrial Flooring - 150 RS SQ. FT',
+    'Garage Flooring - 50 RS SQ. FT',
+    'Basement Flooring - 100 RS SQ FT / 150 RS SQ. FT (Two Different Quality)',
+    'Swimming Pool/Terrace Epoxy Tile Flooring - 300 RS SQ FT',
     'Other',
   ];
 
@@ -54,6 +54,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     _areaController.dispose();
     _approximateAreaController.dispose();
     _notesController.dispose();
+    _otherRequirementController.dispose();
     super.dispose();
   }
 
@@ -927,9 +928,16 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
             items: _services.map((service) {
               return DropdownMenuItem(
                 value: service,
-                child: Text(
-                  service,
-                  overflow: TextOverflow.ellipsis,
+                child: SizedBox(
+                  width: 280, // Fixed width to prevent overflow
+                  child: Text(
+                    service,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: service.length > 40 ? 10 : 12,
+                    ),
+                  ),
                 ),
               );
             }).toList(),
@@ -939,7 +947,81 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
               });
             },
           ),
+          const SizedBox(height: 12),
+          
+          // Pricing note
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: theme.colorScheme.primary.withValues(alpha: 0.2),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '*',
+                  style: TextStyle(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'NOTE - ALL PRICES ARE WITH MATERIAL AND TOP QUALITY WORK AS PER POLICY',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: theme.colorScheme.primary.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w500,
+                      height: 1.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 16),
+          
+          // Other requirement field - only show when "Other" is selected
+          if (_selectedService == 'Other') ...[
+            TextFormField(
+              controller: _otherRequirementController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: 'Please specify your requirement *',
+                hintText: 'Describe your flooring requirement in detail...',
+                prefixIcon: const Icon(Icons.edit_note),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+              ),
+              validator: (value) {
+                if (_selectedService == 'Other' && (value == null || value.isEmpty)) {
+                  return 'Please specify your requirement';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
           
           TextFormField(
             controller: _approximateAreaController,
@@ -1244,6 +1326,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
         approximateArea: _approximateAreaController.text,
         notes: _notesController.text,
         photoCount: _selectedImages.length,
+        otherRequirement: _selectedService == 'Other' ? _otherRequirementController.text : null,
       );
 
       if (mounted) {
@@ -1476,8 +1559,9 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     _areaController.clear();
     _approximateAreaController.clear();
     _notesController.clear();
+    _otherRequirementController.clear();
     setState(() {
-      _selectedService = 'Residential Flooring';
+      _selectedService = 'Residential Flooring - 40 RS SQ. FT';
       _selectedImages.clear();
     });
   }

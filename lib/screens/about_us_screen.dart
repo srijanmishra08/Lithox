@@ -1,9 +1,60 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:video_player/video_player.dart';
 import '../widgets/lithox_logo.dart';
 
-class AboutUsScreen extends StatelessWidget {
+class AboutUsScreen extends StatefulWidget {
   const AboutUsScreen({super.key});
+
+  @override
+  State<AboutUsScreen> createState() => _AboutUsScreenState();
+}
+
+class _AboutUsScreenState extends State<AboutUsScreen> {
+  late PageController _pageController;
+  int _currentMediaIndex = 0;
+  VideoPlayerController? _videoController;
+  
+  final List<MediaItem> _mediaItems = [
+    MediaItem(
+      type: MediaType.image,
+      path: 'assets/images/Box.jpeg',
+      title: 'Premium Epoxy Products',
+      description: 'Our high-quality epoxy products ready for application',
+    ),
+    MediaItem(
+      type: MediaType.image,
+      path: 'assets/images/Floor1.jpeg',
+      title: 'Professional Floor Installation',
+      description: 'Expert application of epoxy flooring solutions',
+    ),
+    MediaItem(
+      type: MediaType.image,
+      path: 'assets/images/floor 2.jpeg',
+      title: 'Finished Epoxy Flooring',
+      description: 'Beautiful, durable epoxy flooring results',
+    ),
+    MediaItem(
+      type: MediaType.video,
+      path: 'assets/images/video1.mp4',
+      title: 'Our Work in Action',
+      description: 'See our professional epoxy application process',
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _videoController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +276,7 @@ class AboutUsScreen extends StatelessWidget {
                           ),
                         ),
                         const TextSpan(
-                          text: ' for two years, Mr. Jain envisioned a company that would blend ',
+                          text: ' for two years, Mr. Manish Jain envisioned a company that would blend ',
                         ),
                         TextSpan(
                           text: 'technical precision, material innovation, and customer trust',
@@ -243,6 +294,11 @@ class AboutUsScreen extends StatelessWidget {
                 ],
               ),
             ),
+            
+            const SizedBox(height: 32),
+            
+            // Media Gallery Section
+            _buildMediaGallery(theme),
             
             const SizedBox(height: 32),
             
@@ -300,27 +356,57 @@ class AboutUsScreen extends StatelessWidget {
                       ),
                       children: [
                         const TextSpan(
-                          text: 'After decades of steady growth and innovation, Lithox continues to evolve under the guidance of ',
+                          text: 'After decades of steady growth and technical refinement, in the 2010s, the management torch was passed to the next generation — sons, ',
                         ),
                         TextSpan(
-                          text: 'the next generation',
+                          text: 'Mr. Hritvik Jain',
                           style: TextStyle(
                             color: theme.colorScheme.secondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         const TextSpan(
-                          text: '. The company remains committed to pushing the boundaries of ',
+                          text: ', an electronics engineer from ',
                         ),
                         TextSpan(
-                          text: 'epoxy technology',
+                          text: 'VIT Vellore',
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const TextSpan(
+                          text: ', and ',
+                        ),
+                        TextSpan(
+                          text: 'Mr. Chinmay Jain',
+                          style: TextStyle(
+                            color: theme.colorScheme.secondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const TextSpan(
+                          text: ', a computer science engineer from ',
+                        ),
+                        TextSpan(
+                          text: 'SRM University, Kattankulathur',
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const TextSpan(
+                          text: '. Under their dynamic leadership, Lithox has expanded digitally, diversified product lines, and embraced ',
+                        ),
+                        TextSpan(
+                          text: 'smart manufacturing',
                           style: TextStyle(
                             color: Colors.teal.shade700,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         const TextSpan(
-                          text: ' while maintaining the core values of excellence, integrity, and customer satisfaction that have defined its legacy.',
+                          text: ', all while preserving the brand\'s core values of integrity, quality, and innovation.',
                         ),
                       ],
                     ),
@@ -455,6 +541,328 @@ class AboutUsScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildMediaGallery(ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.purple.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.photo_library,
+                  color: Colors.purple,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Our Work Gallery',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Explore our premium epoxy products and professional installations',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 20),
+          
+          // Media Carousel
+          Container(
+            height: 300,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                // PageView for media
+                PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentMediaIndex = index;
+                    });
+                    _handleMediaChange(index);
+                  },
+                  itemCount: _mediaItems.length,
+                  itemBuilder: (context, index) {
+                    return _buildMediaItem(_mediaItems[index], theme);
+                  },
+                ),
+                
+                // Media indicators
+                Positioned(
+                  bottom: 16,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _mediaItems.asMap().entries.map((entry) {
+                      return Container(
+                        width: _currentMediaIndex == entry.key ? 24 : 8,
+                        height: 8,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: _currentMediaIndex == entry.key
+                              ? Colors.white
+                              : Colors.white.withValues(alpha: 0.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                
+                // Navigation arrows
+                Positioned(
+                  left: 8,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+                        onPressed: () {
+                          if (_currentMediaIndex > 0) {
+                            _pageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                
+                Positioned(
+                  right: 8,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 20),
+                        onPressed: () {
+                          if (_currentMediaIndex < _mediaItems.length - 1) {
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Current media info
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.purple.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.purple.withValues(alpha: 0.2),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _mediaItems[_currentMediaIndex].title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _mediaItems[_currentMediaIndex].description,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMediaItem(MediaItem item, ThemeData theme) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.grey.shade200,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: item.type == MediaType.image
+            ? _buildImageWidget(item.path)
+            : _buildVideoWidget(item.path),
+      ),
+    );
+  }
+
+  Widget _buildImageWidget(String path) {
+    return Image.asset(
+      path,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          color: Colors.grey.shade300,
+          child: const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                SizedBox(height: 8),
+                Text('Image not found', style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildVideoWidget(String path) {
+    return Container(
+      color: Colors.black,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          if (_videoController != null && _videoController!.value.isInitialized)
+            AspectRatio(
+              aspectRatio: _videoController!.value.aspectRatio,
+              child: VideoPlayer(_videoController!),
+            )
+          else
+            const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.video_library, size: 50, color: Colors.white70),
+                  SizedBox(height: 8),
+                  Text(
+                    'Loading video...',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ],
+              ),
+            ),
+          
+          // Play/Pause button
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: IconButton(
+              iconSize: 40,
+              icon: Icon(
+                _videoController?.value.isPlaying == true
+                    ? Icons.pause
+                    : Icons.play_arrow,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                if (_videoController?.value.isPlaying == true) {
+                  _videoController?.pause();
+                } else {
+                  _videoController?.play();
+                }
+                setState(() {});
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleMediaChange(int index) {
+    final item = _mediaItems[index];
+    
+    if (item.type == MediaType.video) {
+      _initializeVideo(item.path);
+    } else {
+      // Dispose video controller when switching to image
+      _videoController?.dispose();
+      _videoController = null;
+    }
+  }
+
+  void _initializeVideo(String path) {
+    _videoController?.dispose();
+    _videoController = VideoPlayerController.asset(path)
+      ..initialize().then((_) {
+        setState(() {});
+      }).catchError((error) {
+        if (kDebugMode) {
+          debugPrint('Video initialization error: $error');
+        }
+      });
+  }
+
   Widget _buildAchievementItem(
     BuildContext context,
     String title,
@@ -516,4 +924,21 @@ class AboutUsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+// Supporting classes for media gallery
+enum MediaType { image, video }
+
+class MediaItem {
+  final MediaType type;
+  final String path;
+  final String title;
+  final String description;
+
+  MediaItem({
+    required this.type,
+    required this.path,
+    required this.title,
+    required this.description,
+  });
 }

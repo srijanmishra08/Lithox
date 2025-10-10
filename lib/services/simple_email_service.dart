@@ -15,6 +15,7 @@ class SimpleEmailService {
     required String approximateArea,
     required String notes,
     required int photoCount,
+    String? otherRequirement,
   }) async {
     try {
       // Generate unique order ID for tracking
@@ -46,7 +47,7 @@ class SimpleEmailService {
 🔧 SERVICE REQUIREMENTS:
    • Service Type: $serviceType
    • Approximate Area: ${approximateArea.isNotEmpty ? approximateArea : 'Not specified'}
-   • Photos Included: $photoCount photo${photoCount == 1 ? '' : 's'}
+   • Photos Included: $photoCount photo${photoCount == 1 ? '' : 's'}${otherRequirement != null && otherRequirement.isNotEmpty ? '\n   • Other Requirement: $otherRequirement' : ''}
 
 📝 ADDITIONAL NOTES:
 ${notes.isNotEmpty ? notes : 'No additional requirements specified.'}
